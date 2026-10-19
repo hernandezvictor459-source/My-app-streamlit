@@ -65,7 +65,7 @@ with tab1:
     with col2:
         precio_unit, sub, desc, total, ahorro = calcular_cotizacion(cantidad, forma_pago)
 
-        st.markdown(f"### Resumen de la Cotización")
+        st.markdown("### Resumen de la Cotización")
         st.metric(label="Total a Pagar", value=f"RD$ {total:,.2f}")
         st.write(f"**Precio por paquete:** {precio_unit:,.2f}")
         st.write(f"**Subtotal inicial:** {sub:,.2f}")
@@ -79,14 +79,13 @@ with tab1:
 with tab2:
     st.header("Pregúntale al Asistente Comercial de IA")
 
-    st.markdown("""
-    Puedes consultarle dudas de precios, pedirle sugerencias de compra, o generar recordatorios de pago.
-
-    *Ejemplos:*
-    - ¿Cuánto me costarían 500 paquetes pagando al contado?
-    - Redacta un recordatorio amable para un cliente con balance atrasado.
-    - ¿Cuál es el precio para 1,000 paquetes?
-    """)
+    st.markdown(
+        "Puedes consultarle dudas de precios, pedirle sugerencias de compra, o generar recordatorios de pago.\n\n"
+        "*Ejemplos:*\n"
+        "- ¿Cuánto me costarían 500 paquetes pagando al contado?\n"
+        "- Redacta un recordatorio amable para un cliente con balance atrasado.\n"
+        "- ¿Cuál es el precio para 1,000 paquetes?"
+    )
 
     user_prompt = st.text_area(
         "¿En qué puedo ayudarte hoy?",
@@ -159,11 +158,15 @@ with tab3:
 
     with col_t2:
         st.subheader("Descuentos Adicionales")
-        st.markdown("""- **Al Contado:** 5% de descuento adicional.
-- **Crédito Aprobado:** 3% de descuento adicional.
-- **Nota:** Descuento solo aplica después de 50 UND.
-- *Ambos descuentos se aplican sobre el precio correspondiente a la escala de volumen.*""")
+        st.markdown(
+            "- **Al Contado:** 5% de descuento adicional.\n"
+            "- **Crédito Aprobado:** 3% de descuento adicional.\n"
+            "- **Nota:** Descuento solo aplica después de 50 UND.\n"
+            "- *Ambos descuentos se aplican sobre el precio correspondiente a la escala de volumen.*"
+        )
 
-    st.info("""**Políticas Generales:**
-- El precio de la cotización final se determina según la escala alcanzada por el total del pedido.
-- Los créditos son autorizados única y exclusivamente por el departamento administrativo de la empresa.""")
+    st.info(
+        "**Políticas Generales:**\n"
+        "- El precio de la cotización final se determina según la escala alcanzada por el total del pedido.\n"
+        "- Los créditos son autorizados única y exclusivamente por el departamento administrativo de la empresa."
+    )
