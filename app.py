@@ -109,7 +109,7 @@ Respondes siempre en español claro, cordial y profesional.
 
 REGLAS IMPORTANTES:
 
-1. NO inventes precios. Utiliza strictly la siguiente tabla de precios:
+1. NO inventes precios. Utiliza estrictamente la siguiente tabla de precios:
 
 - 1 a 49 paquetes: RD$120 por paquete
 - 50 a 99 paquetes: RD$112 por paquete
@@ -161,10 +161,9 @@ with tab3:
         st.subheader("Descuentos Adicionales")
         st.markdown("""- **Al Contado:** 5% de descuento adicional.
 - **Crédito Aprobado:** 3% de descuento adicional.
-- **Nota:** Descuento solo aplica despues de 50 UND.
+- **Nota:** Descuento solo aplica después de 50 UND.
 - *Ambos descuentos se aplican sobre el precio correspondiente a la escala de volumen.*""")
 
     st.info("""**Políticas Generales:**
 - El precio de la cotización final se determina según la escala alcanzada por el total del pedido.
-- Los créditos son autorizados única y exclusivamente por el departamento administrativo de la empresa."""
-)
+- Los créditos son autorizados única y exclusivamente por el departamento administrativo de la empresa.""")
