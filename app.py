@@ -1,6 +1,5 @@
 eimport streamlit as st
 import pandas as pd
-from google import genai
 import os
 
 # Configuración de página
@@ -49,17 +48,6 @@ def calcular_cotizacion(cantidad_paquetes, forma_pago):
     ahorro_total = (120.0 * cantidad_paquetes) - total if cantidad_paquetes > 0 else 0.0
 
     return precio_unitario, subtotal, descuento_monto, total, ahorro_total
-
-# --- INTERFAZ DE USUARIO DE STREAMLIT ---
-st.title("🥟 Masas Delicias del Caribe, S.R.L.")
-st.subheader("Asistente Comercial Inteligente y Cotizador Mayorista")
-
-# Sidebar - Configuración e Información General
-with st.sidebar:
-    st.header("Sobre la Empresa")
-    st.markdown("""**Actividad:** Fabricación y distribución al por mayor de masas para empanadas.
-**Ubicación:** Santo Domingo, República Dominicana.
-**Sitio web de referencia:** [anko.com.tw](https://anko.com.tw)
 
 *Modelo enfocado exclusivamente a ventas al por mayor (B2B).*""")
 
