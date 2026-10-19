@@ -50,22 +50,11 @@ with st.sidebar:
     st.header("Sobre la Empresa")
     st.markdown("""**Actividad:** Fabricación y distribución al por mayor de masas para empanadas.
 **Vision:** Ser una empresa líder en la fabricación y distribución al por mayor de masas para empanadas en la República Dominicana, reconocida por la calidad de sus productos, la innovación y la confianza de sus clientes comerciales.
-**Mision:**Fabricar masas para empanadas de alta calidad, utilizando ingredientes seleccionados y procesos higiénicos que garanticen productos frescos, seguros y uniformes, satisfaciendo las necesidades de supermercados, restaurantes, cafeterías, distribuidores y otros negocios de alimentos.
+**Mision:** Fabricar masas para empanadas de alta calidad, utilizando ingredientes seleccionados y procesos higiénicos que garanticen productos frescos, seguros y uniformes, satisfaciendo las necesidades de supermercados, restaurantes, cafeterías, distribuidores y otros negocios de alimentos.
 **Ubicación:** Santo Domingo, República Dominicana.
 
 
-*Modelo enfocado exclusivamente a ventas al por mayor (B2B).*""")
-
-    st.markdown("---")
-    st.subheader("🔑 API Key de Gemini")
-    # Intentar obtener la API Key de los secretos o variable de entorno
-    api_key_input = st.text_input(
-        "Introduce tu GOOGLE_API_KEY si no está configurada:",
-        value=os.environ.get("GOOGLE_API_KEY", ""),
-        type="password"
-    )
-
-tab1, tab2, tab3 = st.tabs(["📊 Cotizador Mayorista", "🤖 Asistente Virtual con IA", "📜 Lista de Precios y Políticas"])
+ tab1, tab2, tab3 = st.tabs(["📊 Cotizador Mayorista", "🤖 Asistente Virtual con IA", "📜 Lista de Precios y Políticas"])
 
 # TAB 1: COTIZADOR
 with tab1:
@@ -83,7 +72,7 @@ with tab1:
 
         forma_pago = st.selectbox(
             "Forma de pago:",
-            ["Ninguno / Regular", "Al contado (3%)", "Crédito aprobado (1%)"]
+            ["Ninguno / Regular", "Al contado (5%)", "Crédito aprobado (3%)"]
         )
 
     with col2:
@@ -110,14 +99,7 @@ with tab2:
     user_prompt = st.text_area("¿En qué puedo ayudarte hoy?", height=100, placeholder="Escribe tu consulta aquí...")
 
     if st.button("Enviar Consulta"):
-        final_key = api_key_input if api_key_input else os.environ.get("GOOGLE_API_KEY", "")
-
-        if not final_key:
-            st.error("⚠️ Por favor, introduce tu GOOGLE_API_KEY en la barra lateral para usar el asistente con IA.")
-        else:
-            with st.spinner("Procesando respuesta con Gemini..."):
-                try:
-                    client = genai.Client(api_key=final_key)
+       
 
                     contexto_prompt = f"""
                     Eres el Asistente Comercial Virtual de la empresa 'Masas Delicias del Caribe, S.R.L.'.
@@ -132,8 +114,8 @@ with tab2:
                        - 500 a 999 paquetes: RD$ 92 por paquete
                        - 1,000 o más paquetes: RD$ 85 por paquete
                     2. Descuentos por forma de pago (adicionales):
-                       - Al contado: 3% adicional.
-                       - A crédito aprobado: 1% adicional.
+                       - Al contado: 5% adicional.
+                       - A crédito aprobado: 3% adicional.
                     3. Si el usuario te pregunta sobre la aprobación de créditos, aclara amablemente que tú, como IA, no apruebas créditos ni confirmas pagos directos, y que deben comunicarse con el personal autorizado.
                     4. Si te piden redactar un mensaje de cobro o recordatorio de pago atrasado, hazlo de forma sumamente cordial, respetuosa y profesional.
 
@@ -164,8 +146,8 @@ with tab3:
 
     with col_t2:
         st.subheader("Descuentos Adicionales")
-        st.markdown("""- **Al Contado:** 3% de descuento adicional.
-- **Crédito Aprobado:** 1% de descuento adicional.
+        st.markdown("""- **Al Contado:** 5% de descuento adicional.
+- **Crédito Aprobado:** 3% de descuento adicional.
 - *Ambos descuentos se aplican sobre el precio correspondiente a la escala de volumen.*""")
 
     st.info("""**Políticas Generales:**
