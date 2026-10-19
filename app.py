@@ -32,7 +32,7 @@ def calcular_cotizacion(cantidad, forma_pago):
     descuento_porcentaje = 0.0
     if forma_pago == "Al contado (5%)":
         descuento_porcentaje = 0.05
-    elif forma_pago == "Crédito aprobado (31%)":
+    elif forma_pago == "Crédito aprobado (3%)":
         descuento_porcentaje = 0.03
 
     descuento_monto = subtotal * descuento_porcentaje
@@ -53,6 +53,7 @@ with st.sidebar:
 **Mision:** Fabricar masas para empanadas de alta calidad, utilizando ingredientes seleccionados y procesos higiénicos que garanticen productos frescos, seguros y uniformes, satisfaciendo las necesidades de supermercados, restaurantes, cafeterías, distribuidores y otros negocios de alimentos.
 **Ubicación:** Santo Domingo, República Dominicana.
 
+
 *Modelo enfocado exclusivamente a ventas al por mayor (B2B).*""")
 
     st.markdown("---")
@@ -64,8 +65,7 @@ with st.sidebar:
         type="password"
     )
 
-
- tab1, tab2, tab3 = st.tabs(["📊 Cotizador Mayorista", "🤖 Asistente Virtual con IA", "📜 Lista de Precios y Políticas"])
+tab1, tab2, tab3 = st.tabs(["📊 Cotizador Mayorista", "🤖 Asistente Virtual con IA", "📜 Lista de Precios y Políticas"])
 
 # TAB 1: COTIZADOR
 with tab1:
@@ -110,7 +110,14 @@ with tab2:
     user_prompt = st.text_area("¿En qué puedo ayudarte hoy?", height=100, placeholder="Escribe tu consulta aquí...")
 
     if st.button("Enviar Consulta"):
-       
+        final_key = api_key_input if api_key_input else os.environ.get("GOOGLE_API_KEY", "")
+
+        if not final_key:
+            st.error("⚠️ Por favor, introduce tu GOOGLE_API_KEY en la barra lateral para usar el asistente con IA.")
+        else:
+            with st.spinner("Procesando respuesta con Gemini..."):
+                try:
+                    client = genai.Client(api_key=final_key)
 
                     contexto_prompt = f"""
                     Eres el Asistente Comercial Virtual de la empresa 'Masas Delicias del Caribe, S.R.L.'.
