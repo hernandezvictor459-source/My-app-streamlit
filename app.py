@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-from google import gemini
 from google.gemini import types
 from google import genai
 import os
