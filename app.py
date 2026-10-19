@@ -49,8 +49,9 @@ st.subheader("Asistente Comercial Inteligente y Cotizador Mayorista")
 with st.sidebar:
     st.header("Sobre la Empresa")
     st.markdown("""**Actividad:** Fabricación y distribución al por mayor de masas para empanadas.
+**Vision:** Ser una empresa líder en la fabricación y distribución al por mayor de masas para empanadas en la República Dominicana, reconocida por la calidad de sus productos, la innovación y la confianza de sus clientes comerciales.
 **Ubicación:** Santo Domingo, República Dominicana.
-**Sitio web:** [anko.com.tw](https://anko.com.tw)
+
 
 *Modelo enfocado exclusivamente a ventas al por mayor (B2B).*""")
 
