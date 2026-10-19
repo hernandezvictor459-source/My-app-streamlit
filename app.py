@@ -138,21 +138,20 @@ REGLAS IMPORTANTES:
 
 5. Cuando sea posible, realiza cálculos automáticamente utilizando la información suministrada.
 
-Consulta del usuario:
-{user_prompt}
-"""
+with st.spinner("Procesando respuesta con Gemini..."):
+    try:
+        client = genai.Client()
 
-                    response = client.models.generate_content(
-                        model="gemini-2.5-flash-lite",
-                        contents=contexto_prompt
-                    )
+        response = client.models.generate_content(
+            model="gemini-2.5-flash-lite",
+            contents=contexto_prompt,
+        )
 
-                    st.markdown("### Respuesta del Asistente")
-                    st.write(response.text)
+        st.markdown("### Respuesta del Asistente:")
+        st.write(response.text)
 
-                except Exception as e:
-                    st.error(
-                        f"Ocurrió un error al contactar con Gemini: {str(e)}"
+    except Exception as e:
+        st.error(f"Ocurrió un error al contactar con Gemini: {e}"
                     )
 
 # TAB 3: LISTA DE PRECIOS Y POLÍTICAS
