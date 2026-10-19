@@ -37,7 +37,7 @@ def calcular_cotizacion(cantidad, forma_pago):
 
     descuento_monto = subtotal * descuento_porcentaje
     total = subtotal - descuento_monto
-    ahorro_total = (120.00 * cantidad) - total if cantidad > 0 else 0.00
+    ahorro_total = (120.00 * cantidad) - total if cantidad > 50 else 0.00
 
     return precio_unitario, subtotal, descuento_monto, total, ahorro_total
 
