@@ -1,5 +1,8 @@
 import streamlit as st
 import pandas as pd
+from google import gemini
+from google.gemini import types
+from google import genai
 import os
 
 # Configuración de página
@@ -169,3 +172,4 @@ with tab3:
     st.info("""**Políticas Generales:**
 - El precio de la cotización final se determina según la escala alcanzada por el total del pedido.
 - Los créditos son autorizados única y exclusivamente por el departamento administrativo de la empresa.""")
+~
