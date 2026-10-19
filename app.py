@@ -41,19 +41,6 @@ def calcular_cotizacion(cantidad, forma_pago):
 
     return precio_unitario, subtotal, descuento_monto, total, ahorro_total
 
-# --- INTERFAZ DE USUARIO DE STREAMLIT ---
-st.title("🥟 Masas Delicias del Caribe, S.R.L.")
-st.subheader("Asistente Comercial Inteligente y Cotizador Mayorista")
-
-# Sidebar - Configuración e Información General
-with st.sidebar:
-    st.header("Sobre la Empresa")
-    st.markdown("""**Actividad:** Fabricación y distribución al por mayor de masas para empanadas.
-**Vision:** Ser una empresa líder en la fabricación y distribución al por mayor de masas para empanadas en la República Dominicana, reconocida por la calidad de sus productos, la innovación y la confianza de sus clientes comerciales.
-**Mision:** Fabricar masas para empanadas de alta calidad, utilizando ingredientes seleccionados y procesos higiénicos que garanticen productos frescos, seguros y uniformes, satisfaciendo las necesidades de supermercados, restaurantes, cafeterías, distribuidores y otros negocios de alimentos.
-**Ubicación:** Santo Domingo, República Dominicana.
-
-
 *Modelo enfocado exclusivamente a ventas al por mayor (B2B).*""")
 
     st.markdown("---")
