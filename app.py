@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import os
 
 # Configuración de página
 st.set_page_config(
@@ -25,6 +24,7 @@ def obtener_precio_base(cantidad):
         return 120.0
     return 0.0
 
+
 def calcular_cotizacion(cantidad, forma_pago):
     precio_unitario = obtener_precio_base(cantidad)
     subtotal = cantidad * precio_unitario
@@ -41,18 +41,10 @@ def calcular_cotizacion(cantidad, forma_pago):
 
     return precio_unitario, subtotal, descuento_monto, total, ahorro_total
 
-    st.markdown("---")
-    st.subheader("🔑 API Key de Gemini")
-    # Intentar obtener la API Key de los secretos o variable de entorno
-    api_key_input = st.text_input(
-        "Introduce tu GOOGLE_API_KEY si no está configurada:",
-        value=os.environ.get("GOOGLE_API_KEY", ""),
-        type="password"
-    )
+
+tab1, tab3 = st.tabs(["📊 Cotizador Mayorista", "📜 Lista de Precios y Políticas"])
 
 # TAB 1: COTIZADOR
-tab1, tab2, tab3 = st.tabs(["📊 Cotizador Mayorista", "🤖 Asistente Virtual con IA", "📜 Lista de Precios y Políticas"])
-
 with tab1:
     st.header("Calculadora de Cotizaciones")
     col1, col2 = st.columns(2)
@@ -83,56 +75,6 @@ with tab1:
             st.success(f"🎉 ¡Estás ahorrando RD$ {ahorro:,.2f} comparado con el precio base regular!")
 
         st.caption("Nota: Los precios son ficticios y no incluyen impuestos ni transporte.")
-
-# TAB 2: ASISTENTE VIRTUAL CON IA
-with tab2:
-    st.header("Pregúntale al Asistente Comercial de IA")
-    st.markdown(
-        """Puedes consultarle dudas de precios, pedirle sugerencias de compra, o generar recordatorios de pago.
-        *Ejemplo: '¿Cuánto me costarían 500 paquetes pagando al contado?' o 'Redacta un recordatorio amable para un cliente con balance atrasado'.*"""
-    )
-
-    user_prompt = st.text_area("¿En qué puedo ayudarte hoy?", height=100, placeholder="Escribe tu consulta aquí...")
-
-    if st.button("Enviar Consulta"):
-        final_key = api_key_input if api_key_input else os.environ.get("GOOGLE_API_KEY", "")
-
-        if not final_key:
-            st.error("⚠️ Por favor, introduce tu GOOGLE_API_KEY en la barra lateral para usar el asistente con IA.")
-        else:
-            with st.spinner("Procesando respuesta con Gemini..."):
-                try:
-                    client = genai.Client(api_key=final_key)
-
-                    contexto_prompt = f"""
-                    Eres el Asistente Comercial Virtual de la empresa 'Masas Delicias del Caribe, S.R.L.'.
-                    Respondes en español claro y profesional.
-
-                    REGLAS IMPORTANTES:
-                    1. NO inventes precios. Utiliza estrictamente la siguiente tabla de precios de referencia:
-                       - 1 a 49 paquetes: RD$ 120 por paquete
-                       - 50 a 99 paquetes: RD$ 112 por paquete
-                       - 100 a 249 paquetes: RD$ 105 por paquete
-                       - 250 a 499 paquetes: RD$ 98 por paquete
-                       - 500 a 999 paquetes: RD$ 92 por paquete
-                       - 1,000 o más paquetes: RD$ 85 por paquete
-                    2. Descuentos por forma de pago (adicionales):
-                       - Al contado: 3% adicional.
-                       - A crédito aprobado: 1% adicional.
-                    3. Si el usuario te pregunta sobre la aprobación de créditos, aclara amablemente que tú, como IA, no apruebas créditos ni confirmas pagos directos, y que deben comunicarse con el departamento administrativo.
-                    4. Si te piden redactar un mensaje de cobro o recordatorio de pago atrasado, hazlo de forma sumamente cordial, respetuosa y profesional.
-
-                    Consulta del usuario: {user_prompt}
-                    """
-
-                    response = client.models.generate_content(
-                        model='gemini-2.5-flash-lite',
-                        contents=contexto_prompt,
-                    )
-                    st.markdown("### Respuesta del Asistente:")
-                    st.write(response.text)
-                except Exception as e:
-                    st.error(f"Ocurrió un error al contactar con la API de Gemini: {e}")
 
 # TAB 3: LISTA DE PRECIOS Y POLÍTICAS
 with tab3:
