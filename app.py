@@ -125,8 +125,8 @@ with tab2:
 
                     REGLAS IMPORTANTES:
                     1. NO inventes precios. Utiliza estrictamente la siguiente tabla de precios de referencia:
-                       - 1 a 49 (0%) paquetes: RD$ 120 por paquete
-                       - 50 a 99 (6.7%) paquetes: RD$ 112 por paquete
+                       - 1 a 49 0% paquetes: 0% RD$ 120 por paquete
+                       - 50 a 99 6.7% paquetes: RD$ 112 por paquete
                        - 100 a 249 12.5% paquetes: RD$ 105 por paquete
                        - 250 a 499 18.3% paquetes: RD$ 98 por paquete
                        - 500 a 999 23.3% paquetes: RD$ 92 por paquete
