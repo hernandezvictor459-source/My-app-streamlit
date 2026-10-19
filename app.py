@@ -12,17 +12,17 @@ st.set_page_config(
 # --- LÓGICA DE NEGOCIO (PRECIOS Y COTIZADOR) ---
 def obtener_precio_base(cantidad):
     if cantidad >= 1000:
-        return 85.0
+        return 85.00
     elif cantidad >= 500:
-        return 92.0
+        return 92.00
     elif cantidad >= 250:
-        return 98.0
+        return 98.00
     elif cantidad >= 100:
-        return 105.0
+        return 105.00
     elif cantidad >= 50:
-        return 112.0
+        return 112.00
     elif cantidad >= 1:
-        return 120.0
+        return 120.00
     return 0.0
 
 def calcular_cotizacion(cantidad, forma_pago):
@@ -37,7 +37,7 @@ def calcular_cotizacion(cantidad, forma_pago):
 
     descuento_monto = subtotal * descuento_porcentaje
     total = subtotal - descuento_monto
-    ahorro_total = (120.0 * cantidad) - total if cantidad > 0 else 0.0
+    ahorro_total = (120.00 * cantidad) - total if cantidad > 0 else 0.00
 
     return precio_unitario, subtotal, descuento_monto, total, ahorro_total
 
