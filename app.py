@@ -3,9 +3,13 @@ import pandas as pd
 
 # Configuración de página
 st.set_page_config(
-    page_title="Asistente Comercial - Masas Delicias del Caribe",
+    page_title="Asistente Comercial Inteligente y Cotizador Mayorista",
     page_icon="🥟",
     layout="wide"
+)
+
+st.title("🥟 Masas Delicias del Caribe, S.R.L.")
+st.subheader("Asistente Comercial Inteligente y Cotizador Mayorista")
 )
 
 # --- LÓGICA DE NEGOCIO (PRECIOS Y COTIZADOR) ---
