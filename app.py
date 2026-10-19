@@ -151,8 +151,7 @@ with st.spinner("Procesando respuesta con Gemini..."):
         st.write(response.text)
 
     except Exception as e:
-        st.error(f"Ocurrió un error al contactar con Gemini: {e}"
-                    )
+        st.error(f"Ocurrió un error al contactar con Gemini: {e}")
 
 # TAB 3: LISTA DE PRECIOS Y POLÍTICAS
 with tab3:
