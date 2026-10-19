@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import google.genai as genai
+import os
 
 # Configuración de página
 st.set_page_config(
