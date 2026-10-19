@@ -12,17 +12,17 @@ st.set_page_config(
 # --- LÓGICA DE NEGOCIO (PRECIOS Y COTIZADOR) ---
 def obtener_precio_base(cantidad):
     if cantidad >= 1000:
-        return 85.00
+        return 85.0
     elif cantidad >= 500:
-        return 92.00
+        return 92.0
     elif cantidad >= 250:
-        return 98.00
+        return 98.0
     elif cantidad >= 100:
-        return 105.00
+        return 105.0
     elif cantidad >= 50:
-        return 112.00
+        return 112.0
     elif cantidad >= 1:
-        return 120.00
+        return 120.0
     return 0.0
 
 def calcular_cotizacion(cantidad, forma_pago):
@@ -32,16 +32,40 @@ def calcular_cotizacion(cantidad, forma_pago):
     descuento_porcentaje = 0.0
     if forma_pago == "Al contado (5%)":
         descuento_porcentaje = 0.05
-    elif forma_pago == "Crédito aprobado (3%)":
+    elif forma_pago == "Crédito aprobado (31%)":
         descuento_porcentaje = 0.03
 
     descuento_monto = subtotal * descuento_porcentaje
     total = subtotal - descuento_monto
-    ahorro_total = (120.00 * cantidad) - total if cantidad > 50 else 0.00
+    ahorro_total = (120.0 * cantidad) - total if cantidad > 0 else 0.0
 
     return precio_unitario, subtotal, descuento_monto, total, ahorro_total
 
-tab1, tab2, tab3 = st.tabs(["📊 Cotizador Mayorista", "🤖 Asistente Virtual con IA", "📜 Lista de Precios y Políticas"])
+# --- INTERFAZ DE USUARIO DE STREAMLIT ---
+st.title("🥟 Masas Delicias del Caribe, S.R.L.")
+st.subheader("Asistente Comercial Inteligente y Cotizador Mayorista")
+
+# Sidebar - Configuración e Información General
+with st.sidebar:
+    st.header("Sobre la Empresa")
+    st.markdown("""**Actividad:** Fabricación y distribución al por mayor de masas para empanadas.
+**Vision:** Ser una empresa líder en la fabricación y distribución al por mayor de masas para empanadas en la República Dominicana, reconocida por la calidad de sus productos, la innovación y la confianza de sus clientes comerciales.
+**Mision:** Fabricar masas para empanadas de alta calidad, utilizando ingredientes seleccionados y procesos higiénicos que garanticen productos frescos, seguros y uniformes, satisfaciendo las necesidades de supermercados, restaurantes, cafeterías, distribuidores y otros negocios de alimentos.
+**Ubicación:** Santo Domingo, República Dominicana.
+
+*Modelo enfocado exclusivamente a ventas al por mayor (B2B).*""")
+
+    st.markdown("---")
+    st.subheader("🔑 API Key de Gemini")
+    # Intentar obtener la API Key de los secretos o variable de entorno
+    api_key_input = st.text_input(
+        "Introduce tu GOOGLE_API_KEY si no está configurada:",
+        value=os.environ.get("GOOGLE_API_KEY", ""),
+        type="password"
+    )
+
+
+ tab1, tab2, tab3 = st.tabs(["📊 Cotizador Mayorista", "🤖 Asistente Virtual con IA", "📜 Lista de Precios y Políticas"])
 
 # TAB 1: COTIZADOR
 with tab1:
@@ -86,14 +110,7 @@ with tab2:
     user_prompt = st.text_area("¿En qué puedo ayudarte hoy?", height=100, placeholder="Escribe tu consulta aquí...")
 
     if st.button("Enviar Consulta"):
-        final_key = api_key_input if api_key_input else os.environ.get("GOOGLE_API_KEY", "")
 
-        if not final_key:
-            st.error("⚠️ Por favor, introduce tu GOOGLE_API_KEY en la barra lateral para usar el asistente con IA.")
-        else:
-            with st.spinner("Procesando respuesta con Gemini..."):
-                try:
-                    client = genai.Client(api_key=final_key)
 
                     contexto_prompt = f"""
                     Eres el Asistente Comercial Virtual de la empresa 'Masas Delicias del Caribe, S.R.L.'.
@@ -101,12 +118,12 @@ with tab2:
 
                     REGLAS IMPORTANTES:
                     1. NO inventes precios. Utiliza estrictamente la siguiente tabla de precios de referencia:
-                       - 1 a 49 0% paquetes: 0% RD$ 120 por paquete
-                       - 50 a 99 6.7% paquetes: RD$ 112 por paquete
-                       - 100 a 249 12.5% paquetes: RD$ 105 por paquete
-                       - 250 a 499 18.3% paquetes: RD$ 98 por paquete
-                       - 500 a 999 23.3% paquetes: RD$ 92 por paquete
-                       - 1,000 o más 29.2% paquetes: RD$ 85 por paquete
+                       - 1 a 49 paquetes: RD$ 120 por paquete
+                       - 50 a 99 paquetes: RD$ 112 por paquete
+                       - 100 a 249 paquetes: RD$ 105 por paquete
+                       - 250 a 499 paquetes: RD$ 98 por paquete
+                       - 500 a 999 paquetes: RD$ 92 por paquete
+                       - 1,000 o más paquetes: RD$ 85 por paquete
                     2. Descuentos por forma de pago (adicionales):
                        - Al contado: 5% adicional.
                        - A crédito aprobado: 3% adicional.
@@ -142,7 +159,6 @@ with tab3:
         st.subheader("Descuentos Adicionales")
         st.markdown("""- **Al Contado:** 5% de descuento adicional.
 - **Crédito Aprobado:** 3% de descuento adicional.
--**Nota:** Descuento solo aplica despues de 50 UND.
 - *Ambos descuentos se aplican sobre el precio correspondiente a la escala de volumen.*""")
 
     st.info("""**Políticas Generales:**
