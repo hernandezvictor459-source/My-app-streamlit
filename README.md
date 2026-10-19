@@ -1,3 +1,6 @@
+Masas Delicias del Caribe, SRL
+
+
 Proyecto de aplicación con IA: Masas Delicias del Caribe, S.R.L.
 Propuesta para una aplicación inteligente de atención al cliente, ventas al por mayor y gestión de consultas comerciales.
 1. Los problemas y usuarios de esta empresa
