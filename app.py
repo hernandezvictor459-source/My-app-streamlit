@@ -166,6 +166,7 @@ with tab3:
         st.subheader("Descuentos Adicionales")
         st.markdown("""- **Al Contado:** 5% de descuento adicional.
 - **Crédito Aprobado:** 3% de descuento adicional.
+-**Nota:** Descuento solo aplica despues de 50 UND.
 - *Ambos descuentos se aplican sobre el precio correspondiente a la escala de volumen.*""")
 
     st.info("""**Políticas Generales:**
