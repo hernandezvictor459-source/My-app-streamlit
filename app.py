@@ -41,19 +41,6 @@ def calcular_cotizacion(cantidad, forma_pago):
 
     return precio_unitario, subtotal, descuento_monto, total, ahorro_total
 
-# --- INTERFAZ DE USUARIO DE STREAMLIT ---
-st.title("🥟 Masas Delicias del Caribe, S.R.L.")
-st.subheader("Asistente Comercial Inteligente y Cotizador Mayorista")
-
-# Sidebar - Configuración e Información General
-with st.sidebar:
-    st.header("Sobre la Empresa")
-    st.markdown("""**Actividad:** Fabricación y distribución al por mayor de masas para empanadas.
-**Ubicación:** Santo Domingo, República Dominicana.
-**Sitio web:** [anko.com.tw](https://anko.com.tw)
-
-*Modelo enfocado exclusivamente a ventas al por mayor (B2B).*""")
-
     st.markdown("---")
     st.subheader("🔑 API Key de Gemini")
     # Intentar obtener la API Key de los secretos o variable de entorno
