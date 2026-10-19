@@ -53,6 +53,17 @@ with st.sidebar:
 **Mision:** Fabricar masas para empanadas de alta calidad, utilizando ingredientes seleccionados y procesos higiénicos que garanticen productos frescos, seguros y uniformes, satisfaciendo las necesidades de supermercados, restaurantes, cafeterías, distribuidores y otros negocios de alimentos.
 **Ubicación:** Santo Domingo, República Dominicana.
 
+*Modelo enfocado exclusivamente a ventas al por mayor (B2B).*""")
+
+    st.markdown("---")
+    st.subheader("🔑 API Key de Gemini")
+    # Intentar obtener la API Key de los secretos o variable de entorno
+    api_key_input = st.text_input(
+        "Introduce tu GOOGLE_API_KEY si no está configurada:",
+        value=os.environ.get("GOOGLE_API_KEY", ""),
+        type="password"
+    )
+
 
  tab1, tab2, tab3 = st.tabs(["📊 Cotizador Mayorista", "🤖 Asistente Virtual con IA", "📜 Lista de Precios y Políticas"])
 
