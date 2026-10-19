@@ -30,10 +30,10 @@ def calcular_cotizacion(cantidad, forma_pago):
     subtotal = cantidad * precio_unitario
 
     descuento_porcentaje = 0.0
-    if forma_pago == "Al contado (3%)":
+    if forma_pago == "Al contado (5%)":
+        descuento_porcentaje = 0.05
+    elif forma_pago == "Crédito aprobado (31%)":
         descuento_porcentaje = 0.03
-    elif forma_pago == "Crédito aprobado (1%)":
-        descuento_porcentaje = 0.01
 
     descuento_monto = subtotal * descuento_porcentaje
     total = subtotal - descuento_monto
