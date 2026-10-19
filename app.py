@@ -41,16 +41,6 @@ def calcular_cotizacion(cantidad, forma_pago):
 
     return precio_unitario, subtotal, descuento_monto, total, ahorro_total
 
-*Modelo enfocado exclusivamente a ventas al por mayor (B2B).*""")
-
-    st.markdown("---")
-    st.subheader("🔑 API Key de Gemini")
-    # Intentar obtener la API Key de los secretos o variable de entorno
-    api_key_input = st.text_input(
-        "Introduce tu GOOGLE_API_KEY si no está configurada:",
-        value=os.environ.get("GOOGLE_API_KEY", ""),
-        type="password"
-    )
 
 tab1, tab2, tab3 = st.tabs(["📊 Cotizador Mayorista", "🤖 Asistente Virtual con IA", "📜 Lista de Precios y Políticas"])
 
