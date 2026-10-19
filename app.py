@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import google.genai as genai
+import os
 
 # Configuración de página
 st.set_page_config(
@@ -41,6 +41,17 @@ def calcular_cotizacion(cantidad, forma_pago):
 
     return precio_unitario, subtotal, descuento_monto, total, ahorro_total
 
+*Modelo enfocado exclusivamente a ventas al por mayor (B2B).*""")
+
+    st.markdown("---")
+    st.subheader("🔑 API Key de Gemini")
+    # Intentar obtener la API Key de los secretos o variable de entorno
+    api_key_input = st.text_input(
+        "Introduce tu GOOGLE_API_KEY si no está configurada:",
+        value=os.environ.get("GOOGLE_API_KEY", ""),
+        type="password"
+    )
+
 tab1, tab2, tab3 = st.tabs(["📊 Cotizador Mayorista", "🤖 Asistente Virtual con IA", "📜 Lista de Precios y Políticas"])
 
 # TAB 1: COTIZADOR
@@ -65,7 +76,7 @@ with tab1:
     with col2:
         precio_unit, sub, desc, total, ahorro = calcular_cotizacion(cantidad, forma_pago)
 
-        st.markdown("### Resumen de la Cotización")
+        st.markdown(f"### Resumen de la Cotización")
         st.metric(label="Total a Pagar", value=f"RD$ {total:,.2f}")
         st.write(f"**Precio por paquete:** {precio_unit:,.2f}")
         st.write(f"**Subtotal inicial:** {sub:,.2f}")
@@ -78,59 +89,52 @@ with tab1:
 # TAB 2: ASISTENTE VIRTUAL CON IA
 with tab2:
     st.header("Pregúntale al Asistente Comercial de IA")
-
     st.markdown(
-        "Puedes consultarle dudas de precios, pedirle sugerencias de compra, o generar recordatorios de pago.\n\n"
-        "*Ejemplos:*\n"
-        "- ¿Cuánto me costarían 500 paquetes pagando al contado?\n"
-        "- Redacta un recordatorio amable para un cliente con balance atrasado.\n"
-        "- ¿Cuál es el precio para 1,000 paquetes?"
+        """Puedes consultarle dudas de precios, pedirle sugerencias de compra, o generar recordatorios de pago.
+        *Ejemplo: '¿Cuánto me costarían 500 paquetes pagando al contado?' o 'Redacta un recordatorio amable para un cliente con balance atrasado'.*"""
     )
 
-    user_prompt = st.text_area(
-        "¿En qué puedo ayudarte hoy?",
-        height=100,
-        placeholder="Escribe tu consulta aquí..."
-    )
+    user_prompt = st.text_area("¿En qué puedo ayudarte hoy?", height=100, placeholder="Escribe tu consulta aquí...")
 
     if st.button("Enviar Consulta"):
-        if not user_prompt.strip():
-            st.warning("Por favor escribe una consulta.")
+        final_key = api_key_input if api_key_input else os.environ.get("GOOGLE_API_KEY", "")
+
+        if not final_key:
+            st.error("⚠️ Por favor, introduce tu GOOGLE_API_KEY en la barra lateral para usar el asistente con IA.")
         else:
             with st.spinner("Procesando respuesta con Gemini..."):
                 try:
-                    client = genai.Client()
+                    client = genai.Client(api_key=final_key)
 
-                    contexto_prompt = (
-                        "Eres el Asistente Comercial Virtual de la empresa 'Masas Delicias del Caribe, S.R.L.'.\n"
-                        "Respondes siempre en español claro, cordial y profesional.\n\n"
-                        "REGLAS IMPORTANTES:\n"
-                        "1. NO inventes precios. Utiliza estrictamente la siguiente tabla de precios:\n"
-                        "- 1 a 49 paquetes: RD$120 por paquete\n"
-                        "- 50 a 99 paquetes: RD$112 por paquete\n"
-                        "- 100 a 249 paquetes: RD$105 por paquete\n"
-                        "- 250 a 499 paquetes: RD$98 por paquete\n"
-                        "- 500 a 999 paquetes: RD$92 por paquete\n"
-                        "- 1,000 o más paquetes: RD$85 por paquete\n\n"
-                        "2. Descuentos adicionales:\n"
-                        "- Al contado: 5%\n"
-                        "- Crédito aprobado: 3%\n\n"
-                        "3. Si preguntan por aprobación de crédito, explica que las aprobaciones son gestionadas exclusivamente por el departamento administrativo.\n"
-                        "4. Si solicitan mensajes de cobro o recordatorios de pago, redacta textos muy cordiales, respetuosos y profesionales.\n"
-                        "5. Cuando sea posible, realiza cálculos automáticamente utilizando la información suministrada.\n\n"
-                        f"Consulta del usuario:\n{user_prompt}"
-                    )
+                    contexto_prompt = f"""
+                    Eres el Asistente Comercial Virtual de la empresa 'Masas Delicias del Caribe, S.R.L.'.
+                    Respondes en español claro y profesional.
+
+                    REGLAS IMPORTANTES:
+                    1. NO inventes precios. Utiliza estrictamente la siguiente tabla de precios de referencia:
+                       - 1 a 49 0% paquetes: 0% RD$ 120 por paquete
+                       - 50 a 99 6.7% paquetes: RD$ 112 por paquete
+                       - 100 a 249 12.5% paquetes: RD$ 105 por paquete
+                       - 250 a 499 18.3% paquetes: RD$ 98 por paquete
+                       - 500 a 999 23.3% paquetes: RD$ 92 por paquete
+                       - 1,000 o más 29.2% paquetes: RD$ 85 por paquete
+                    2. Descuentos por forma de pago (adicionales):
+                       - Al contado: 5% adicional.
+                       - A crédito aprobado: 3% adicional.
+                    3. Si el usuario te pregunta sobre la aprobación de créditos, aclara amablemente que tú, como IA, no apruebas créditos ni confirmas pagos directos, y que deben comunicarse con el personal autorizado.
+                    4. Si te piden redactar un mensaje de cobro o recordatorio de pago atrasado, hazlo de forma sumamente cordial, respetuosa y profesional.
+
+                    Consulta del usuario: {user_prompt}
+                    """
 
                     response = client.models.generate_content(
-                        model="gemini-2.5-flash-lite",
+                        model='gemini-2.5-flash-lite',
                         contents=contexto_prompt,
                     )
-
                     st.markdown("### Respuesta del Asistente:")
                     st.write(response.text)
-
                 except Exception as e:
-                    st.error(f"Ocurrió un error al contactar con Gemini: {e}")
+                    st.error(f"Ocurrió un error al contactar con la API de Gemini: {e}")
 
 # TAB 3: LISTA DE PRECIOS Y POLÍTICAS
 with tab3:
@@ -147,15 +151,11 @@ with tab3:
 
     with col_t2:
         st.subheader("Descuentos Adicionales")
-        st.markdown(
-            "- **Al Contado:** 5% de descuento adicional.\n"
-            "- **Crédito Aprobado:** 3% de descuento adicional.\n"
-            "- **Nota:** Descuento solo aplica después de 50 UND.\n"
-            "- *Ambos descuentos se aplican sobre el precio correspondiente a la escala de volumen.*"
-        )
+        st.markdown("""- **Al Contado:** 5% de descuento adicional.
+- **Crédito Aprobado:** 3% de descuento adicional.
+-**Nota:** Descuento solo aplica despues de 50 UND.
+- *Ambos descuentos se aplican sobre el precio correspondiente a la escala de volumen.*""")
 
-    st.info(
-        "**Políticas Generales:**\n"
-        "- El precio de la cotización final se determina según la escala alcanzada por el total del pedido.\n"
-        "- Los créditos son autorizados única y exclusivamente por el departamento administrativo de la empresa."
-    )
+    st.info("""**Políticas Generales:**
+- El precio de la cotización final se determina según la escala alcanzada por el total del pedido.
+- Los créditos son autorizados única y exclusivamente por el departamento administrativo de la empresa.""")
