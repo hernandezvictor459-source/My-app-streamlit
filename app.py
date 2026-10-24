@@ -106,8 +106,34 @@ st.markdown(
         }
 
         .stDataFrame {
-            background: rgba(255, 255, 255, 0.02);
+            background: #0b0f0f !important;
             border-radius: 12px;
+            color: #edf2f2 !important;
+        }
+
+        .stDataFrame div[data-testid="stDataFrame"] {
+            background: #0b0f0f !important;
+        }
+
+        .stDataFrame table,
+        .stDataFrame table thead th,
+        .stDataFrame table tbody td,
+        .stDataFrame .dataframe,
+        .stDataFrame .dataframe thead tr th,
+        .stDataFrame .dataframe tbody tr td {
+            background: #0b0f0f !important;
+            color: #edf2f2 !important;
+            border-color: rgba(255, 255, 255, 0.08) !important;
+        }
+
+        .stDataFrame table thead th {
+            background: rgba(255, 255, 255, 0.03) !important;
+            color: #fff !important;
+            font-weight: 700;
+        }
+
+        .stDataFrame table tbody tr:nth-child(even) td {
+            background: rgba(255, 255, 255, 0.02) !important;
         }
 
         div[data-testid="stTextInputRootElement"],
