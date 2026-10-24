@@ -66,17 +66,35 @@ def obtener_respuesta_gemini(final_key, user_prompt):
     if not user_prompt or not user_prompt.strip():
         raise ValueError("Escribe una consulta antes de enviar.")
 
+    modelos_disponibles = [
+        "gemini-2.0-flash",
+        "gemini-2.5-flash",
+        "gemini-3.5-flash-lite",
+    ]
+
+    ultimo_error = None
     client = genai.Client(api_key=final_key)
-    response = client.models.generate_content(
-        model="gemini-2.5-flash-lite",
-        contents=construir_prompt_usuario(user_prompt),
+
+    for modelo in modelos_disponibles:
+        try:
+            response = client.models.generate_content(
+                model=modelo,
+                contents=construir_prompt_usuario(user_prompt),
+            )
+            texto = getattr(response, "text", "")
+            if not texto or not str(texto).strip():
+                raise ValueError("La API respondió vacía. Intenta nuevamente.")
+            return str(texto).strip()
+        except Exception as e:
+            ultimo_error = e
+            mensaje = str(e).lower()
+            if "404" in str(e) or "not_found" in mensaje:
+                continue
+            raise
+
+    raise RuntimeError(
+        f"No se pudo conectar con ningún modelo disponible de Gemini. Último error: {ultimo_error}"
     )
-
-    texto = getattr(response, "text", "")
-    if not texto or not str(texto).strip():
-        raise ValueError("La API respondió vacía. Intenta nuevamente.")
-
-    return str(texto).strip()
 
 
 def mostrar_error_api(error):
