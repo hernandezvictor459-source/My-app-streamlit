@@ -1,0 +1,35 @@
+from langchain_chroma import Chroma
+from langchain_core.runnables import RunnablePassthrough, RunnableLambda
+
+# 1. Base vectorial utilizando el corpus extraído del documento .docx
+vectorstore_base = Chroma.from_texts(
+    texts=documentos_docx,
+    embedding=embeddings,
+    collection_name="base_conocimientos_agente"
+)
+
+# 2. Retriever dinámico
+retriever_base = vectorstore_base.as_retriever(search_kwargs={"k": 3})
+
+# 3. Cadena RAG
+cadena_rag_base = (
+    {
+        "context": retriever_base | RunnableLambda(format_docs),
+        "question": RunnablePassthrough()
+    }
+    | prompt
+    | llm
+    | RunnableLambda(lambda m: m.content)
+)
+
+# 4. Prueba del RAG
+pregunta_rag = "¿Cuáles son los precios de los productos de Masas Delicias del Caribe?"
+print(f"Pregunta formulada al RAG: {pregunta_rag}")
+
+raw_res_rag = cadena_rag_base.invoke(pregunta_rag)
+if isinstance(raw_res_rag, list) and len(raw_res_rag) > 0 and isinstance(raw_res_rag[0], dict):
+    respuesta_final = raw_res_rag[0].get('text', '')
+else:
+    respuesta_final = str(raw_res_rag)
+
+print(f"\nRespuesta obtenida del RAG:\n{respuesta_final}")
