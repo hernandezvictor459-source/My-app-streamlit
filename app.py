@@ -16,9 +16,8 @@ st.title("🥟 Masas Delicias del Caribe, S.R.L.")
 st.subheader("Asistente Comercial Inteligente y Cotizador Mayorista")
 
 # Campo para API key en la barra lateral
-
 def obtener_clave_google():
-    # Prioridad: valor ingresado por usuario en la sesión, luego env var, luego secrets
+    """Obtiene la API Key priorizando entrada del usuario, luego env vars y secrets."""
     clave = st.session_state.get("google_api_key", "")
     if not clave:
         clave = os.environ.get("GOOGLE_API_KEY", "")
@@ -27,8 +26,74 @@ def obtener_clave_google():
             clave = st.secrets.get("GOOGLE_API_KEY", "")
         except Exception:
             clave = ""
-    return str(clave).strip()
+    return str(clave).strip() if clave else ""
 
+
+def validar_clave_google(clave):
+    """Valida formato básico de la clave antes de intentar usarla."""
+    if not clave:
+        return False, "No hay una Google API Key disponible."
+    if len(clave) < 10:
+        return False, "La Google API Key parece incompleta o inválida."
+    return True, ""
+
+
+def construir_prompt_usuario(user_prompt):
+    return f"""
+    Eres el Asistente Comercial Virtual de la empresa 'Masas Delicias del Caribe, S.R.L.'.
+    Respondes en español claro y profesional.
+
+    REGLAS IMPORTANTES:
+    1. NO inventes precios. Utiliza estrictamente la siguiente tabla de precios de referencia:
+       - 1 a 49 paquetes: RD$ 120 por paquete
+       - 50 a 99 paquetes: RD$ 112 por paquete
+       - 100 a 249 paquetes: RD$ 105 por paquete
+       - 250 a 499 paquetes: RD$ 98 por paquete
+       - 500 a 999 paquetes: RD$ 92 por paquete
+       - 1,000 o más paquetes: RD$ 85 por paquete
+    2. Descuentos por forma de pago (adicionales):
+       - Al contado: 3% adicional.
+       - A crédito aprobado: 1% adicional.
+    3. Si el usuario te pregunta sobre aprobación de créditos, aclara amablemente que tú, como IA, no apruebas créditos ni confirmas pagos directos, y que deben comunicarse con el departamento administrativo.
+    4. Si te piden redactar un mensaje de cobro o recordatorio de pago atrasado, hazlo de forma cordial, respetuosa y profesional.
+    5. Si no tienes información suficiente para responder, dilo con honestidad y sugiere cómo obtenerla.
+
+    Consulta del usuario: {user_prompt}
+    """
+
+
+def obtener_respuesta_gemini(final_key, user_prompt):
+    if not user_prompt or not user_prompt.strip():
+        raise ValueError("Escribe una consulta antes de enviar.")
+
+    client = genai.Client(api_key=final_key)
+    response = client.models.generate_content(
+        model="gemini-2.5-flash-lite",
+        contents=construir_prompt_usuario(user_prompt),
+    )
+
+    texto = getattr(response, "text", "")
+    if not texto or not str(texto).strip():
+        raise ValueError("La API respondió vacía. Intenta nuevamente.")
+
+    return str(texto).strip()
+
+
+def mostrar_error_api(error):
+    mensaje = str(error).lower()
+
+    if "api key" in mensaje or "authentication" in mensaje or "unauthorized" in mensaje or "forbidden" in mensaje:
+        return "⚠️ La Google API Key no es válida, no tiene permisos o está vencida."
+    if "quota" in mensaje or "rate limit" in mensaje or "too many requests" in mensaje:
+        return "⚠️ La API de Gemini está temporalmente sobrecargada o excedió su cuota. Intenta más tarde."
+    if "model" in mensaje and "not found" in mensaje:
+        return "⚠️ El modelo solicitado no está disponible para esta cuenta."
+    if "timeout" in mensaje or "timed out" in mensaje:
+        return "⚠️ La solicitud tardó demasiado tiempo. Reintenta más tarde."
+    return f"⚠️ No se pudo procesar la consulta. Detalle técnico: {error}"
+
+
+st.sidebar.caption("La clave se guarda solo en la sesión del navegador o en variables de entorno/secrets del servidor.")
 
 google_api_key = st.sidebar.text_input(
     "Google API Key",
@@ -95,7 +160,7 @@ with tab1:
     with col2:
         precio_unit, sub, desc, total, ahorro = calcular_cotizacion(cantidad, forma_pago)
 
-        st.markdown(f"### Resumen de la Cotización")
+        st.markdown("### Resumen de la Cotización")
         st.metric(label="Total a Pagar", value=f"RD$ {total:,.2f}")
         st.write(f"**Precio por paquete:** {precio_unit:,.2f}")
         st.write(f"**Subtotal inicial:** {sub:,.2f}")
@@ -116,44 +181,22 @@ with tab2:
     user_prompt = st.text_area("¿En qué puedo ayudarte hoy?", height=100, placeholder="Escribe tu consulta aquí...")
 
     if st.button("Enviar Consulta"):
-        final_key = obtener_clave_google()
+        clave_actual = obtener_clave_google()
+        es_valida, mensaje = validar_clave_google(clave_actual)
 
-        if not final_key:
-            st.error("⚠️ Por favor, introduce tu GOOGLE_API_KEY en la barra lateral para usar el asistente con IA.")
+        if not es_valida:
+            st.warning(f"⚠️ {mensaje}")
+            st.info("Puedes ingresar la API key en la barra lateral o configurarla como GOOGLE_API_KEY en variables de entorno o secrets.")
         else:
             with st.spinner("Procesando respuesta con Gemini..."):
                 try:
-                    client = genai.Client(api_key=final_key)
-
-                    contexto_prompt = f"""
-                    Eres el Asistente Comercial Virtual de la empresa 'Masas Delicias del Caribe, S.R.L.'.
-                    Respondes en español claro y profesional.
-
-                    REGLAS IMPORTANTES:
-                    1. NO inventes precios. Utiliza estrictamente la siguiente tabla de precios de referencia:
-                       - 1 a 49 paquetes: RD$ 120 por paquete
-                       - 50 a 99 paquetes: RD$ 112 por paquete
-                       - 100 a 249 paquetes: RD$ 105 por paquete
-                       - 250 a 499 paquetes: RD$ 98 por paquete
-                       - 500 a 999 paquetes: RD$ 92 por paquete
-                       - 1,000 o más paquetes: RD$ 85 por paquete
-                    2. Descuentos por forma de pago (adicionales):
-                       - Al contado: 3% adicional.
-                       - A crédito aprobado: 1% adicional.
-                    3. Si el usuario te pregunta sobre la aprobación de créditos, aclara amablemente que tú, como IA, no apruebas créditos ni confirmas pagos directos, y que deben comunicarse con el departamento administrativo.
-                    4. Si te piden redactar un mensaje de cobro o recordatorio de pago atrasado, hazlo de forma sumamente cordial, respetuosa y profesional.
-
-                    Consulta del usuario: {user_prompt}
-                    """
-
-                    response = client.models.generate_content(
-                        model='gemini-2.5-flash-lite',
-                        contents=contexto_prompt,
-                    )
+                    respuesta = obtener_respuesta_gemini(clave_actual, user_prompt)
                     st.markdown("### Respuesta del Asistente:")
-                    st.write(response.text)
+                    st.write(respuesta)
+                except ValueError as e:
+                    st.error(f"⚠️ {e}")
                 except Exception as e:
-                    st.error(f"Ocurrió un error al contactar con la API de Gemini: {e}")
+                    st.error(mostrar_error_api(e))
 
 # TAB 3: LISTA DE PRECIOS Y POLÍTICAS
 with tab3:
