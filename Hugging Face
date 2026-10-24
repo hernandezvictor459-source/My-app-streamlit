@@ -1,0 +1,21 @@
+from transformers import pipeline
+
+# Inicializamos el pipeline de zero-shot classification
+clasificador_reto = pipeline(
+    "zero-shot-classification",
+    model="MoritzLaurer/mDeBERTa-v3-base-mnli-xnli",
+    revision="8adb042d524ecd5c26d3e3ba0e3fbcf7e2d0864c"
+)
+
+# Categorías de prueba orientadas a la base de conocimiento
+categorias_retos = ["información general", "productos", "precios y pedidos", "soporte técnico"]
+pregunta_ejemplo = "¿Cómo puedo realizar un pedido en Masas Delicias del Caribe?"
+
+resultado_zs = clasificador_reto(
+    pregunta_ejemplo,
+    candidate_labels=categorias_retos,
+    hypothesis_template="Este texto trata sobre {}."
+)
+
+print(f"Pregunta: {pregunta_ejemplo}")
+print(f"Categoría detectada (Hugging Face): {resultado_zs['labels'][0]} (Confianza: {resultado_zs['scores'][0]:.4f})")
