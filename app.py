@@ -11,6 +11,110 @@ st.set_page_config(
     layout="wide"
 )
 
+# --- ESTILO VISUAL (tema rojo elegante) ---
+st.markdown(
+    """
+    <style>
+        .stApp {
+            background: linear-gradient(135deg, #180606 0%, #3d0909 35%, #5e0d0d 100%);
+            color: #fff4f4;
+        }
+
+        .block-container {
+            padding-top: 1.2rem;
+            padding-bottom: 2rem;
+        }
+
+        div[data-testid="stSidebar"] {
+            background: linear-gradient(180deg, #2a0303 0%, #4d0909 100%);
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .stTabs [role="tablist"] {
+            gap: 0.75rem;
+        }
+
+        .stTabs [role="tab"] {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px 12px 0 0;
+            color: #f7dcdc;
+            padding: 0.7rem 1.2rem;
+        }
+
+        .stTabs [role="tab"][aria-selected="true"] {
+            background: linear-gradient(180deg, #7a1212 0%, #4a0909 100%);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 10px 22px rgba(0, 0, 0, 0.2);
+        }
+
+        .panel-red {
+            background: rgba(45, 9, 9, 0.92);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            padding: 1.2rem 1.3rem;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+            margin-bottom: 1rem;
+        }
+
+        .panel-red h3, .panel-red h4, .panel-red h5 {
+            color: #fff1f1;
+            margin-top: 0;
+        }
+
+        .assistant-title {
+            color: #ffd7d7;
+            letter-spacing: 0.02em;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-box {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 14px;
+            padding: 0.75rem 1rem;
+        }
+
+        .table-wrapper {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 14px;
+            padding: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .stAlert {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #fff4f4;
+        }
+
+        .stMetricValue {
+            color: #fff2f2;
+        }
+
+        .stDataFrame {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+        }
+
+        div[data-testid="stTextInputRootElement"],
+        div[data-testid="stTextAreaRootElement"] {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+        }
+
+        input, textarea, select {
+            color: #fff !important;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 # Título principal del encabezado
 st.title("🥟 Masas Delicias del Caribe, S.R.L.")
 st.subheader("Asistente Comercial Inteligente y Cotizador Mayorista")
@@ -113,6 +217,8 @@ def mostrar_error_api(error):
 
 st.sidebar.caption("La clave se guarda solo en la sesión del navegador o en variables de entorno/secrets del servidor.")
 
+st.sidebar.markdown("<div class='panel-red'> <h4>Acceso AI</h4> </div>", unsafe_allow_html=True)
+
 google_api_key = st.sidebar.text_input(
     "Google API Key",
     type="password",
@@ -158,7 +264,7 @@ tab1, tab2, tab3 = st.tabs(["📊 Cotizador Mayorista", "🤖 Asistente Virtual 
 
 # TAB 1: COTIZADOR
 with tab1:
-    st.header("Calculadora de Cotizaciones")
+    st.markdown('<div class="panel-red"><h3>Calculadora de Cotizaciones</h3></div>', unsafe_allow_html=True)
     col1, col2 = st.columns(2)
 
     with col1:
@@ -178,6 +284,7 @@ with tab1:
     with col2:
         precio_unit, sub, desc, total, ahorro = calcular_cotizacion(cantidad, forma_pago)
 
+        st.markdown('<div class="panel-red">', unsafe_allow_html=True)
         st.markdown("### Resumen de la Cotización")
         st.metric(label="Total a Pagar", value=f"RD$ {total:,.2f}")
         st.write(f"**Precio por paquete:** {precio_unit:,.2f}")
@@ -185,20 +292,24 @@ with tab1:
         st.write(f"**Descuento aplicado:** {desc:,.2f}")
         if ahorro > 0:
             st.success(f"🎉 ¡Estás ahorrando RD$ {ahorro:,.2f} comparado con el precio base regular!")
-
         st.caption("Nota: Los precios son ficticios y no incluyen impuestos ni transporte.")
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # TAB 2: ASISTENTE VIRTUAL CON IA
 with tab2:
-    st.header("Pregúntale al Asistente Comercial de IA")
+    st.markdown(
+        '<div class="panel-red"><div class="assistant-title">🤖 Asistente Virtual con IA</div></div>',
+        unsafe_allow_html=True,
+    )
     st.markdown(
         """Puedes consultarle dudas de precios, pedirle sugerencias de compra, o generar recordatorios de pago.
         *Ejemplo: '¿Cuánto me costarían 500 paquetes pagando al contado?' o 'Redacta un recordatorio amable para un cliente con balance atrasado'.*"""
     )
 
-    user_prompt = st.text_area("¿En qué puedo ayudarte hoy?", height=100, placeholder="Escribe tu consulta aquí...")
+    st.markdown('<div class="panel-red">', unsafe_allow_html=True)
+    user_prompt = st.text_area("¿En qué puedo ayudarte hoy?", height=120, placeholder="Escribe tu consulta aquí...")
 
-    if st.button("Enviar Consulta"):
+    if st.button("Enviar Consulta", use_container_width=True):
         clave_actual = obtener_clave_google()
         es_valida, mensaje = validar_clave_google(clave_actual)
 
@@ -215,10 +326,11 @@ with tab2:
                     st.error(f"⚠️ {e}")
                 except Exception as e:
                     st.error(mostrar_error_api(e))
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # TAB 3: LISTA DE PRECIOS Y POLÍTICAS
 with tab3:
-    st.header("Políticas Comerciales de Referencia")
+    st.markdown('<div class="panel-red"><h3>Políticas Comerciales de Referencia</h3></div>', unsafe_allow_html=True)
 
     col_t1, col_t2 = st.columns(2)
     with col_t1:
@@ -227,14 +339,27 @@ with tab3:
             "Rango de Paquetes": ["1-49", "50-99", "100-249", "250-499", "500-999", "1,000+"],
             "Precio por Unidad (RD$)": [120.00, 112.00, 105.00, 98.00, 92.00, 85.00]
         })
+        st.markdown('<div class="table-wrapper">', unsafe_allow_html=True)
         st.table(df_precios)
+        st.markdown('</div>', unsafe_allow_html=True)
 
     with col_t2:
         st.subheader("Descuentos Adicionales")
-        st.markdown("""- **Al Contado:** 3% de descuento adicional.
+        st.markdown(
+            """- **Al Contado:** 3% de descuento adicional.
 - **Crédito Aprobado:** 1% de descuento adicional.
-- *Ambos descuentos se aplican sobre el precio correspondiente a la escala de volumen.*""")
+- *Ambos descuentos se aplican sobre el precio correspondiente a la escala de volumen.*"""
+        )
 
-    st.info("""**Políticas Generales:**
-- El precio de la cotización final se determina según la escala alcanzada por el total del pedido.
-- Los créditos son autorizados única y exclusivamente por el departamento administrativo de la empresa.""")
+    st.markdown(
+        """
+        <div class="panel-red">
+            <strong>Políticas Generales:</strong>
+            <ul>
+                <li>El precio de la cotización final se determina según la escala alcanzada por el total del pedido.</li>
+                <li>Los créditos son autorizados única y exclusivamente por el departamento administrativo de la empresa.</li>
+            </ul>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
