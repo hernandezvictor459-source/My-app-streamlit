@@ -16,7 +16,26 @@ st.title("🥟 Masas Delicias del Caribe, S.R.L.")
 st.subheader("Asistente Comercial Inteligente y Cotizador Mayorista")
 
 # Campo para API key en la barra lateral
-api_key_input = st.sidebar.text_input("Google API Key", type="password")
+
+def obtener_clave_google():
+    # Prioridad: valor ingresado por usuario en la sesión, luego env var, luego secrets
+    clave = st.session_state.get("google_api_key", "")
+    if not clave:
+        clave = os.environ.get("GOOGLE_API_KEY", "")
+    if not clave:
+        try:
+            clave = st.secrets.get("GOOGLE_API_KEY", "")
+        except Exception:
+            clave = ""
+    return str(clave).strip()
+
+
+google_api_key = st.sidebar.text_input(
+    "Google API Key",
+    type="password",
+    key="google_api_key",
+    help="Ingresa tu clave aquí o configúrala como GOOGLE_API_KEY en variables de entorno o secrets."
+)
 
 # --- LÓGICA DE NEGOCIO (PRECIOS Y COTIZADOR) ---
 def obtener_precio_base(cantidad):
@@ -97,7 +116,7 @@ with tab2:
     user_prompt = st.text_area("¿En qué puedo ayudarte hoy?", height=100, placeholder="Escribe tu consulta aquí...")
 
     if st.button("Enviar Consulta"):
-        final_key = api_key_input if api_key_input else os.environ.get("GOOGLE_API_KEY", "")
+        final_key = obtener_clave_google()
 
         if not final_key:
             st.error("⚠️ Por favor, introduce tu GOOGLE_API_KEY en la barra lateral para usar el asistente con IA.")
