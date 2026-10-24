@@ -11,13 +11,13 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- ESTILO VISUAL (tema oscuro con acento rojo en IA, más compacto y ejecutivo) ---
+# --- ESTILO VISUAL (tema claro con acento rojo en IA, compacto y ejecutivo) ---
 st.markdown(
     """
     <style>
         .stApp {
-            background: #010505;
-            color: #edf2f2;
+            background: #f4f7f7;
+            color: #1d2323;
         }
 
         .block-container {
@@ -26,8 +26,8 @@ st.markdown(
         }
 
         div[data-testid="stSidebar"] {
-            background: linear-gradient(180deg, #0a0f0f 0%, #141919 100%);
-            border-right: 1px solid rgba(255, 255, 255, 0.06);
+            background: linear-gradient(180deg, #eef2f2 0%, #edf0f0 100%);
+            border-right: 1px solid rgba(0, 0, 0, 0.08);
         }
 
         .stTabs [role="tablist"] {
@@ -36,36 +36,39 @@ st.markdown(
         }
 
         .stTabs [role="tab"] {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(0, 0, 0, 0.08);
             border-radius: 10px 10px 0 0;
-            color: #eef3f3;
+            color: #1f2727;
             padding: 0.55rem 1rem;
             min-height: 0;
         }
 
         .stTabs [role="tab"][aria-selected="true"] {
-            background: linear-gradient(180deg, #7a1212 0%, #410a0a 100%);
+            background: linear-gradient(180deg, #a51c1c 0%, #731010 100%);
             color: #ffffff;
-            border-color: rgba(255, 255, 255, 0.12);
-            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.24);
+            border-color: rgba(0, 0, 0, 0.08);
+            box-shadow: 0 8px 18px rgba(100, 18, 18, 0.18);
         }
 
         h1 {
             margin-bottom: 0.2rem;
             font-size: 2.0rem;
+            color: #1d2323;
         }
 
         h2 {
             font-size: 1.3rem;
             margin-top: 0.2rem;
             margin-bottom: 0.6rem;
+            color: #252c2c;
         }
 
         h3 {
             font-size: 1.1rem;
             margin-top: 0.15rem;
             margin-bottom: 0.35rem;
+            color: #1e2424;
         }
 
         .kpi-strip {
@@ -78,59 +81,59 @@ st.markdown(
         .kpi-chip {
             flex: 1 1 180px;
             min-width: 180px;
-            background: linear-gradient(180deg, rgba(22, 28, 28, 1) 0%, rgba(12, 16, 16, 1) 100%);
-            border: 1px solid rgba(255,255,255,0.07);
+            background: linear-gradient(180deg, #ffffff 0%, #f3f6f6 100%);
+            border: 1px solid rgba(0,0,0,0.07);
             border-radius: 14px;
             padding: 0.7rem 0.9rem;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 8px 18px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 18px rgba(0,0,0,0.04);
         }
 
         .kpi-chip .label {
             font-size: 0.72rem;
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            color: #bfcfcf;
+            color: #556060;
             margin-bottom: 0.15rem;
         }
 
         .kpi-chip .value {
             font-size: 1.2rem;
             font-weight: 700;
-            color: #ffffff;
+            color: #171d1d;
         }
 
         .kpi-chip .trend {
             margin-top: 0.25rem;
             font-size: 0.72rem;
-            color: #f0b0b0;
+            color: #8d1d1d;
         }
 
-        .panel-dark {
-            background: rgba(12, 16, 16, 0.96);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+        .panel-light {
+            background: rgba(255, 255, 255, 0.98);
+            border: 1px solid rgba(0, 0, 0, 0.08);
             border-radius: 16px;
             padding: 1rem 1.05rem;
-            box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18);
+            box-shadow: 0 10px 22px rgba(0, 0, 0, 0.04);
             margin-bottom: 0.85rem;
         }
 
         .panel-ia {
-            background: linear-gradient(180deg, rgba(42, 8, 8, 0.55) 0%, rgba(12, 16, 16, 0.96) 100%);
-            border: 1px solid rgba(229, 88, 88, 0.42);
+            background: linear-gradient(180deg, rgba(255, 242, 242, 0.9) 0%, rgba(255, 255, 255, 0.98) 100%);
+            border: 1px solid rgba(180, 29, 29, 0.25);
             border-radius: 16px;
             padding: 1rem 1.05rem;
-            box-shadow: 0 10px 24px rgba(97, 16, 16, 0.18);
+            box-shadow: 0 10px 24px rgba(130, 18, 18, 0.08);
             margin-bottom: 0.85rem;
         }
 
-        .panel-dark h3, .panel-dark h4, .panel-dark h5,
+        .panel-light h3, .panel-light h4, .panel-light h5,
         .panel-ia h3, .panel-ia h4, .panel-ia h5 {
-            color: #fff;
+            color: #1d2323;
             margin-top: 0;
         }
 
         .assistant-title {
-            color: #ffd7d7;
+            color: #8d1d1d;
             letter-spacing: 0.02em;
             font-size: 1.4rem;
             font-weight: 700;
@@ -138,30 +141,30 @@ st.markdown(
         }
 
         .table-wrapper {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 12px;
             padding: 0.4rem;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.08);
         }
 
         .stAlert {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: #fff;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            color: #1d2323;
         }
 
         .stMetricValue {
-            color: #fff;
+            color: #1d2323;
         }
 
         .stDataFrame {
-            background: #0b0f0f !important;
+            background: #ffffff !important;
             border-radius: 12px;
-            color: #edf2f2 !important;
+            color: #1d2323 !important;
         }
 
         .stDataFrame div[data-testid="stDataFrame"] {
-            background: #0b0f0f !important;
+            background: #ffffff !important;
         }
 
         .stDataFrame table,
@@ -170,25 +173,25 @@ st.markdown(
         .stDataFrame .dataframe,
         .stDataFrame .dataframe thead tr th,
         .stDataFrame .dataframe tbody tr td {
-            background: #0b0f0f !important;
-            color: #edf2f2 !important;
-            border-color: rgba(255, 255, 255, 0.08) !important;
+            background: #ffffff !important;
+            color: #1d2323 !important;
+            border-color: rgba(0, 0, 0, 0.09) !important;
         }
 
         .stDataFrame table thead th {
-            background: rgba(255, 255, 255, 0.03) !important;
-            color: #fff !important;
+            background: #f5f7f7 !important;
+            color: #1d2323 !important;
             font-weight: 700;
         }
 
         .stDataFrame table tbody tr:nth-child(even) td {
-            background: rgba(255, 255, 255, 0.02) !important;
+            background: #fafbfb !important;
         }
 
         div[data-testid="stTextInputRootElement"],
         div[data-testid="stTextAreaRootElement"] {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(0, 0, 0, 0.08);
             border-radius: 12px;
         }
 
@@ -198,7 +201,7 @@ st.markdown(
             color: #fff;
             font-weight: 700;
             border-radius: 12px;
-            box-shadow: 0 10px 22px rgba(120, 18, 18, 0.28);
+            box-shadow: 0 10px 22px rgba(120, 18, 18, 0.18);
             min-height: 2.5rem;
         }
 
@@ -208,7 +211,7 @@ st.markdown(
         }
 
         input, textarea, select {
-            color: #fff !important;
+            color: #1d2323 !important;
         }
     </style>
     """,
@@ -346,7 +349,7 @@ def mostrar_error_api(error):
 
 st.sidebar.caption("La clave se guarda solo en la sesión del navegador o en variables de entorno/secrets del servidor.")
 
-st.sidebar.markdown("<div class='panel-dark'> <h4>Acceso AI</h4> </div>", unsafe_allow_html=True)
+st.sidebar.markdown("<div class='panel-light'> <h4>Acceso AI</h4> </div>", unsafe_allow_html=True)
 
 google_api_key = st.sidebar.text_input(
     "Google API Key",
@@ -393,7 +396,7 @@ tab1, tab2, tab3 = st.tabs(["📊 Cotizador Mayorista", "🤖 Asistente Virtual 
 
 # TAB 1: COTIZADOR
 with tab1:
-    st.markdown('<div class="panel-dark"><h3>Calculadora de Cotizaciones</h3></div>', unsafe_allow_html=True)
+    st.markdown('<div class="panel-light"><h3>Calculadora de Cotizaciones</h3></div>', unsafe_allow_html=True)
     col1, col2 = st.columns(2)
 
     with col1:
@@ -414,7 +417,7 @@ with tab1:
     with col2:
         precio_unit, sub, desc, total, ahorro = calcular_cotizacion(cantidad, forma_pago)
 
-        st.markdown('<div class="panel-dark">', unsafe_allow_html=True)
+        st.markdown('<div class="panel-light">', unsafe_allow_html=True)
         st.markdown("### Resumen de la Cotización")
         st.metric(label="Total a Pagar", value=f"RD$ {total:,.2f}")
         st.write(f"**Precio por paquete:** {precio_unit:,.2f}")
@@ -460,7 +463,7 @@ with tab2:
 
 # TAB 3: LISTA DE PRECIOS Y POLÍTICAS
 with tab3:
-    st.markdown('<div class="panel-dark"><h3>Políticas Comerciales de Referencia</h3></div>', unsafe_allow_html=True)
+    st.markdown('<div class="panel-light"><h3>Políticas Comerciales de Referencia</h3></div>', unsafe_allow_html=True)
 
     col_t1, col_t2 = st.columns(2)
     with col_t1:
@@ -483,7 +486,7 @@ with tab3:
 
     st.markdown(
         """
-        <div class="panel-dark">
+        <div class="panel-light">
             <strong>Políticas Generales:</strong>
             <ul>
                 <li>El precio de la cotización final se determina según la escala alcanzada por el total del pedido.</li>
