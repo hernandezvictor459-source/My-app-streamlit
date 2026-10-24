@@ -11,7 +11,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- ESTILO VISUAL (tema oscuro con acento rojo en IA) ---
+# --- ESTILO VISUAL (tema oscuro con acento rojo en IA, más compacto y ejecutivo) ---
 st.markdown(
     """
     <style>
@@ -21,7 +21,7 @@ st.markdown(
         }
 
         .block-container {
-            padding-top: 1.2rem;
+            padding-top: 0.8rem;
             padding-bottom: 2rem;
         }
 
@@ -31,40 +31,96 @@ st.markdown(
         }
 
         .stTabs [role="tablist"] {
-            gap: 0.75rem;
+            gap: 0.65rem;
+            margin-bottom: 0.5rem;
         }
 
         .stTabs [role="tab"] {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px 12px 0 0;
+            border-radius: 10px 10px 0 0;
             color: #eef3f3;
-            padding: 0.7rem 1.2rem;
+            padding: 0.55rem 1rem;
+            min-height: 0;
         }
 
         .stTabs [role="tab"][aria-selected="true"] {
             background: linear-gradient(180deg, #7a1212 0%, #410a0a 100%);
             color: #ffffff;
             border-color: rgba(255, 255, 255, 0.12);
-            box-shadow: 0 10px 22px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.24);
+        }
+
+        h1 {
+            margin-bottom: 0.2rem;
+            font-size: 2.0rem;
+        }
+
+        h2 {
+            font-size: 1.3rem;
+            margin-top: 0.2rem;
+            margin-bottom: 0.6rem;
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            margin-top: 0.15rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .kpi-strip {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin: 0 0 0.9rem 0;
+        }
+
+        .kpi-chip {
+            flex: 1 1 180px;
+            min-width: 180px;
+            background: linear-gradient(180deg, rgba(22, 28, 28, 1) 0%, rgba(12, 16, 16, 1) 100%);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 14px;
+            padding: 0.7rem 0.9rem;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 8px 18px rgba(0,0,0,0.15);
+        }
+
+        .kpi-chip .label {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #bfcfcf;
+            margin-bottom: 0.15rem;
+        }
+
+        .kpi-chip .value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .kpi-chip .trend {
+            margin-top: 0.25rem;
+            font-size: 0.72rem;
+            color: #f0b0b0;
         }
 
         .panel-dark {
             background: rgba(12, 16, 16, 0.96);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 18px;
-            padding: 1.2rem 1.3rem;
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
-            margin-bottom: 1rem;
+            border-radius: 16px;
+            padding: 1rem 1.05rem;
+            box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18);
+            margin-bottom: 0.85rem;
         }
 
         .panel-ia {
             background: linear-gradient(180deg, rgba(42, 8, 8, 0.55) 0%, rgba(12, 16, 16, 0.96) 100%);
             border: 1px solid rgba(229, 88, 88, 0.42);
-            border-radius: 18px;
-            padding: 1.2rem 1.3rem;
-            box-shadow: 0 12px 28px rgba(97, 16, 16, 0.18);
-            margin-bottom: 1rem;
+            border-radius: 16px;
+            padding: 1rem 1.05rem;
+            box-shadow: 0 10px 24px rgba(97, 16, 16, 0.18);
+            margin-bottom: 0.85rem;
         }
 
         .panel-dark h3, .panel-dark h4, .panel-dark h5,
@@ -76,22 +132,15 @@ st.markdown(
         .assistant-title {
             color: #ffd7d7;
             letter-spacing: 0.02em;
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 700;
-            margin-bottom: 0.25rem;
-        }
-
-        .metric-box {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.07);
-            border-radius: 14px;
-            padding: 0.75rem 1rem;
+            margin-bottom: 0.10rem;
         }
 
         .table-wrapper {
             background: rgba(255, 255, 255, 0.03);
-            border-radius: 14px;
-            padding: 0.5rem;
+            border-radius: 12px;
+            padding: 0.4rem;
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
@@ -150,6 +199,7 @@ st.markdown(
             font-weight: 700;
             border-radius: 12px;
             box-shadow: 0 10px 22px rgba(120, 18, 18, 0.28);
+            min-height: 2.5rem;
         }
 
         div.stButton > button:hover {
@@ -168,6 +218,35 @@ st.markdown(
 # Título principal del encabezado
 st.title("🥟 Masas Delicias del Caribe, S.R.L.")
 st.subheader("Asistente Comercial Inteligente y Cotizador Mayorista")
+
+# Panel ejecutivo compactado con KPI chips
+st.markdown(
+    """
+    <div class="kpi-strip">
+        <div class="kpi-chip">
+            <div class="label">Volumen</div>
+            <div class="value">1,240</div>
+            <div class="trend">+12.4% vs. mes anterior</div>
+        </div>
+        <div class="kpi-chip">
+            <div class="label">Descuento promedio</div>
+            <div class="value">2.8%</div>
+            <div class="trend">Ajuste por forma de pago</div>
+        </div>
+        <div class="kpi-chip">
+            <div class="label">Pedidos activos</div>
+            <div class="value">18</div>
+            <div class="trend">6 por aprobación</div>
+        </div>
+        <div class="kpi-chip">
+            <div class="label">Ahorro estimado</div>
+            <div class="value">RD$ 45,200</div>
+            <div class="trend">Respaldo por volumen</div>
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
 # Campo para API key en la barra lateral
 def obtener_clave_google():
@@ -323,7 +402,8 @@ with tab1:
             min_value=1,
             max_value=100000,
             value=100,
-            step=50
+            step=50,
+            help="Cada paquete equivale a 12 unidades."
         )
 
         forma_pago = st.selectbox(
