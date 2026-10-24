@@ -1,5 +1,7 @@
-import streamlit as st
+import os
 import json
+import pandas as pd
+import streamlit as st
 from google import genai
 
 # Configuración de página
@@ -12,6 +14,9 @@ st.set_page_config(
 # Título principal del encabezado
 st.title("🥟 Masas Delicias del Caribe, S.R.L.")
 st.subheader("Asistente Comercial Inteligente y Cotizador Mayorista")
+
+# Campo para API key en la barra lateral
+api_key_input = st.sidebar.text_input("Google API Key", type="password")
 
 # --- LÓGICA DE NEGOCIO (PRECIOS Y COTIZADOR) ---
 def obtener_precio_base(cantidad):
@@ -116,7 +121,7 @@ with tab2:
                     2. Descuentos por forma de pago (adicionales):
                        - Al contado: 3% adicional.
                        - A crédito aprobado: 1% adicional.
-                    3. Si el usuario te pregunta sobre la aprobación de créditos, aclara amablemente que tú, como IA, no apruebas créditos ni confirmas pagos directos, y que deben comunicarse con el personal autorizado.
+                    3. Si el usuario te pregunta sobre la aprobación de créditos, aclara amablemente que tú, como IA, no apruebas créditos ni confirmas pagos directos, y que deben comunicarse con el departamento administrativo.
                     4. Si te piden redactar un mensaje de cobro o recordatorio de pago atrasado, hazlo de forma sumamente cordial, respetuosa y profesional.
 
                     Consulta del usuario: {user_prompt}
