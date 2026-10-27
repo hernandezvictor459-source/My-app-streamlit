@@ -234,7 +234,7 @@ with st.sidebar:
         key="google_api_key",
     )
     if clave_ingresada:
-        st.session_state["google_api_key"] = clave_ingresada.strip("AQ.Ab8RN6LBR7-xuGloxs_6XeGQYfYpcgy2RZOdeVvxnqkXSWfe9A")
+        st.session_state["google_api_key"] = clave_ingresada.strip(AQ.Ab8RN6LBR7-xuGloxs_6XeGQYfYpcgy2RZOdeVvxnqkXSWfe9A)
 
 # Panel ejecutivo compactado con KPI chips
 st.markdown(
