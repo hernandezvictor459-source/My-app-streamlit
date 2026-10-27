@@ -265,7 +265,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Campo para API key en la barra lateral
+
 def obtener_clave_gemini():
     """Obtiene la API Key de Gemini priorizando la entrada del usuario, luego env vars y secrets."""
     clave = st.session_state.get("gemini_api_key", "").strip()
@@ -277,6 +277,11 @@ def obtener_clave_gemini():
         except Exception:
             clave = ""
     return clave
+
+
+def clave_gemini():
+    """Alias para compatibilidad con llamadas anteriores."""
+    return obtener_clave_gemini()
 
 
 def validar_clave_gemini(clave):
@@ -409,18 +414,17 @@ def mostrar_error_api(error):
     return f"⚠️ No se pudo procesar la consulta. Detalle técnico: {error}"
 
 
-def clave_gemini():
-    """Obtiene la API Key de Gemini priorizando la entrada del usuario, luego env vars y secrets."""
-    clave = st.session_state.get("gemini_api_key", "").strip()
-    if not clave:
-        clave = os.environ.get("GEMINI_API_KEY", "").strip()
-    if not clave:
-        try:
-            clave = st.secrets["gemini"]["GEMINI_API_KEY"].strip()
-        except Exception:
-            clave = ""
-    return clave
-    
+def respuesta_ia(user_prompt):
+    """Genera la respuesta usando Gemini o el modo local de respaldo."""
+    if not user_prompt or not str(user_prompt).strip():
+        return "Escribe una consulta antes de enviar.", "error"
+
+    clave_actual = obtener_clave_gemini()
+    es_valida, mensaje = validar_clave_gemini(clave_actual)
+
+    if not clave_actual:
+        return generar_respuesta_local(user_prompt), "local"
+
     if not es_valida:
         st.warning(f"⚠️ {mensaje}")
         st.info("Se usará la respuesta local porque la clave no es válida o no existe.")
@@ -507,12 +511,18 @@ with tab1:
 
 # TAB 2: ASISTENTE VIRTUAL CON IA
 with tab2:
-    st.markdown(...)
-    st.markdown(""" ... """)
-    
+    st.markdown(
+        '<div class="panel-ia"><div class="assistant-title">🤖 Asistente Virtual con IA</div></div>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        """Puedes consultarle dudas de precios, pedirle sugerencias de compra, o generar recordatorios de pago.
+        *Ejemplo: '¿Cuánto me costarían 500 paquetes pagando al contado?' o 'Redacta un recordatorio amable para un cliente con balance atrasado'.*"""
+    )
+
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = []
-    
+
     for mensaje in st.session_state.chat_history:
         with st.chat_message(mensaje["role"]):
             st.write(mensaje["content"])
@@ -520,20 +530,17 @@ with tab2:
     user_prompt = st.chat_input("Escribí tu consulta aquí...")
 
     if user_prompt:
-        ...
-    user_prompt = st.chat_input("Escribí tu consulta aquí...")
+        st.session_state.chat_history.append({"role": "user", "content": user_prompt})
+        with st.chat_message("user"):
+            st.write(user_prompt)
 
-   if user_prompt:
-    st.session_state.chat_history.append({"role": "user", "content": user_prompt})
-    with st.chat_message("user"):
-        st.write(user_prompt)
+        with st.chat_message("assistant"):
+            with st.spinner("Pensando..."):
+                respuesta, _ = respuesta_ia(user_prompt)
+            st.write(respuesta)
 
-    with st.chat_message("assistant"):
-        with st.spinner("Pensando..."):
-            respuesta, _ = respuesta_ia(user_prompt)   # <- nombre correcto
-        st.write(respuesta)
+        st.session_state.chat_history.append({"role": "assistant", "content": respuesta})
 
-    st.session_state.chat_history.append({"role": "assistant", "content": respuesta})
     col_limpiar, _ = st.columns([1, 3])
     with col_limpiar:
         if st.button("Reiniciar conversación", use_container_width=True):
