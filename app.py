@@ -255,16 +255,15 @@ st.markdown(
 # Campo para API key en la barra lateral
 def obtener_clave_google():
     """Obtiene la API Key priorizando entrada del usuario, luego env vars y secrets."""
-    clave = st.session_state.get("google_api_key", "google_api_key")
+    clave = st.session_state.get("google_api_key")
     if not clave:
-        clave = os.environ.get("GOOGLE_API_KEY", ("")
+        clave = os.environ.get("GOOGLE_API_KEY")
     if not clave:
         try:
-            clave = st.secrets.get("GOOGLE_API_KEY"), ("")
+            clave = st.secrets.get("GOOGLE_API_KEY")
         except Exception:
             clave = ""
     return str(clave).strip() if clave else ""
-
 
 
 def validar_clave_google(clave):
@@ -292,7 +291,7 @@ def construir_prompt_usuario(user_prompt):
     2. Descuentos por forma de pago (adicionales):
        - Al contado: 3% adicional.
        - A crédito aprobado: 1% adicional.
-    3. Si el usuario te pregunta sobre aprobación de créditos, aclara amablemente que tú, como IA, no apruebas créditos ni confirmas pagos directos, y que deben comunicarse con el departamento administrativo de la empresa.
+    3. Si el usuario te pregunta sobre aprobación de créditos, aclara amablemente que tú, como IA, no apruebas créditos ni confirmas pagos directos, y que deben comunicarse con el departamento administrativo para gestionar la solicitud.
     4. Si te piden redactar un mensaje de cobro o recordatorio de pago atrasado, hazlo de forma cordial, respetuosa y profesional.
     5. Si no tienes información suficiente para responder, dilo con honestidad y sugiere cómo obtenerla.
 
