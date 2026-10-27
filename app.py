@@ -446,3 +446,4 @@ with tab1:
         st.write(f"**Precio por paquete:** {precio_unit:,.2f}")
         st.write(f"**Subtotal inicial:** {sub:,.2f}")
         st.write(f
+                )
