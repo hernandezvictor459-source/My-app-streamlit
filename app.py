@@ -290,7 +290,7 @@ def construir_prompt_usuario(user_prompt):
     2. Descuentos por forma de pago (adicionales):
        - Al contado: 3% adicional.
        - A crédito aprobado: 1% adicional.
-    3. Si el usuario te pregunta sobre aprobación de créditos, aclara amablemente que tú, como IA, no apruebas créditos ni confirmas pagos directos, y que deben comunicarse con el departamento administrativo.
+    3. Si el usuario te pregunta sobre aprobación de créditos, aclara amablemente que tú, como IA, no apruebas créditos ni confirmas pagos directos, y que deben comunicarse con el departamento administrativo de la empresa.
     4. Si te piden redactar un mensaje de cobro o recordatorio de pago atrasado, hazlo de forma cordial, respetuosa y profesional.
     5. Si no tienes información suficiente para responder, dilo con honestidad y sugiere cómo obtenerla.
 
@@ -351,11 +351,17 @@ st.sidebar.caption("La clave se guarda solo en la sesión del navegador o en var
 
 st.sidebar.markdown("<div class='panel-light'> <h4>Acceso AI</h4> </div>", unsafe_allow_html=True)
 
+# Carga automática desde variables de entorno o secrets para que el asistente pueda usarse sin pedir la clave cada vez.
+clave_automatica = obtener_clave_google()
+if clave_automatica:
+    st.session_state["google_api_key"] = clave_automatica
+
 google_api_key = st.sidebar.text_input(
     "Google API Key",
     type="password",
-    key="google_appy_key",
-    help="Ingresa tu clave aquí o configúrala como GOOGLE_API_KEY en variables de entorno o secrets."
+    key="google_api_key",
+    value=clave_automatica,
+    help="Se usa automáticamente desde variables de entorno o secrets si están configuradas."
 )
 
 # --- LÓGICA DE NEGOCIO (PRECIOS Y COTIZADOR) ---
