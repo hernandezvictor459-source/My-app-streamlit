@@ -333,7 +333,30 @@ def obtener_respuesta_gemini(final_key, user_prompt):
     )
 
 
+def mostrar_error_api(error):
+    mensaje = str(error).lower()
 
+    if "api key" in mensaje or "authentication" in mensaje or "unauthorized" in mensaje or "forbidden" in mensaje:
+        return "⚠️ La Google API Key no es válida, no tiene permisos o está vencida."
+    if "quota" in mensaje or "rate limit" in mensaje or "too many requests" in mensaje:
+        return "⚠️ La API de Gemini está temporalmente sobrecargada o excedió su cuota. Intenta más tarde."
+    if "model" in mensaje and "not found" in mensaje:
+        return "⚠️ El modelo solicitado no está disponible para esta cuenta."
+    if "timeout" in mensaje or "timed out" in mensaje:
+        return "⚠️ La solicitud tardó demasiado tiempo. Reintenta más tarde."
+    return f"⚠️ No se pudo procesar la consulta. Detalle técnico: {error}"
+
+
+st.sidebar.caption("La clave se guarda solo en la sesión del navegador o en variables de entorno/secrets del servidor.")
+
+st.sidebar.markdown("<div class='panel-light'> <h4>Acceso AI</h4> </div>", unsafe_allow_html=True)
+
+google_api_key = st.sidebar.text_input(
+    "Google API Key",
+    type="password",
+    key="AQ.Ab8RN6J-SWjCvc1AWQsvU6exjG0PxVYHZaptNi98lHe9-GHelw",
+    help="Ingresa tu clave aquí o configúrala como GOOGLE_API_KEY en variables de entorno o secrets."
+)
 
 # --- LÓGICA DE NEGOCIO (PRECIOS Y COTIZADOR) ---
 def obtener_precio_base(cantidad):
