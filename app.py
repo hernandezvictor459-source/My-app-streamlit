@@ -223,6 +223,19 @@ st.markdown(
 st.title("🥟 Masas Delicias del Caribe, S.R.L.")
 st.subheader("Asistente Comercial Inteligente y Cotizador Mayorista")
 
+# Sidebar con la clave API de Gemini
+with st.sidebar:
+    st.markdown("### Credenciales Gemini")
+    clave_ingresada = st.text_input(
+        "API Key de Gemini",
+        type="password",
+        value=st.session_state.get("google_api_key", ""),
+        help="Ingresá la clave de Google AI Studio / Gemini.",
+        key="google_api_key",
+    )
+    if clave_ingresada:
+        st.session_state["google_api_key"] = clave_ingresada.strip()
+
 # Panel ejecutivo compactado con KPI chips
 st.markdown(
     """
@@ -254,24 +267,24 @@ st.markdown(
 
 # Campo para API key en la barra lateral
 def obtener_clave_google():
-    """Obtiene la API Key priorizando entrada del usuario, luego env vars y secrets."""
-    clave = st.session_state.get("google_api_key")
+    """Obtiene la API Key de Gemini priorizando la entrada del usuario, luego env vars y secrets."""
+    clave = st.session_state.get("google_api_key", "").strip()
     if not clave:
-        clave = os.environ.get("GOOGLE_API_KEY")
+        clave = os.environ.get("GOOGLE_API_KEY", "").strip()
     if not clave:
         try:
-            clave = st.secrets.get("GOOGLE_API_KEY")
+            clave = st.secrets["google"]["GOOGLE_API_KEY"].strip()
         except Exception:
             clave = ""
-    return str(clave).strip() if clave else ""
+    return clave
 
 
 def validar_clave_google(clave):
     """Valida formato básico de la clave antes de intentar usarla."""
     if not clave:
-        return False, "No hay una Google API Key disponible."
+        return False, "No hay una Gemini API Key disponible."
     if len(clave) < 10:
-        return False, "La gemini API Key parece incompleta o inválida."
+        return False, "La Gemini API Key parece incompleta o inválida."
     return True, ""
 
 
@@ -341,7 +354,7 @@ def generar_respuesta_local(user_prompt):
         )
 
     return (
-        "Sin clave de Google configurada, esta sesión está funcionando en modo local con la información comercial de la empresa. "
+        "Sin clave de Gemini configurada, esta sesión está funcionando en modo local con la información comercial de la empresa. "
         "La política vigente indica: 1-49 = RD$ 120, 50-99 = RD$ 112, 100-249 = RD$ 105, 250-499 = RD$ 98, 500-999 = RD$ 92 y 1,000+ = RD$ 85. "
         "También aplica 3% al contado y 1% en crédito aprobado."
     )
@@ -386,7 +399,7 @@ def mostrar_error_api(error):
     mensaje = str(error).lower()
 
     if "api key" in mensaje or "authentication" in mensaje or "unauthorized" in mensaje or "forbidden" in mensaje:
-        return "⚠️ La Google API Key no es válida, no tiene permisos o está vencida."
+        return "⚠️ La Gemini API Key no es válida, no tiene permisos o está vencida."
     if "quota" in mensaje or "rate limit" in mensaje or "too many requests" in mensaje:
         return "⚠️ La API de Gemini está temporalmente sobrecargada o excedió su cuota. Intenta más tarde."
     if "model" in mensaje and "not found" in mensaje:
@@ -489,7 +502,7 @@ with tab2:
                 respuesta = generar_respuesta_local(user_prompt)
                 st.markdown("### Respuesta del Asistente:")
                 st.write(respuesta)
-                st.caption("Modo local activado: no se usa Google API Key.")
+                st.caption("Modo local activado: no se usa la Gemini API Key.")
         else:
             if not es_valida:
                 st.warning(f"⚠️ {mensaje}")
