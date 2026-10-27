@@ -298,6 +298,54 @@ def construir_prompt_usuario(user_prompt):
     """
 
 
+def generar_respuesta_local(user_prompt):
+    """Respuesta alternativa cuando no hay API key configurada."""
+    texto = (user_prompt or "").strip()
+    if not texto:
+        return "Escribe una consulta para comenzar."
+
+    texto_lower = texto.lower()
+
+    if "500" in texto_lower and "contado" in texto_lower:
+        return (
+            "Con 500 paquetes, el precio base aplica la escala de 500 a 999 paquetes: RD$ 92 por paquete. "
+            "Si paga al contado, hay un descuento adicional del 3%. "
+            "El cálculo estimado sería: 500 × 92 = RD$ 46,000 antes del descuento; con 3% adicional, el total final aproximado es RD$ 44,620."
+        )
+
+    if "precio" in texto_lower or "cuánto" in texto_lower or "costo" in texto_lower:
+        if any(num in texto_lower for num in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]):
+            return (
+                "La política comercial es por rangos de volumen: 1-49 paquetes a RD$ 120, 50-99 a RD$ 112, "
+                "100-249 a RD$ 105, 250-499 a RD$ 98, 500-999 a RD$ 92 y 1,000+ a RD$ 85. "
+                "Además, al contado aplica 3% y crédito aprobado 1% adicional."
+            )
+
+    if "recordatorio" in texto_lower or "cobro" in texto_lower or "pago atrasado" in texto_lower:
+        return (
+            "Estimado cliente, le recordamos que su saldo pendiente requiere atención. "
+            "Agradecemos su pronta gestión para regularizar la cuota correspondiente. "
+            "Si desea, podemos ayudarle a preparar un mensaje más formal o más amable según su caso."
+        )
+
+    if "crédito" in texto_lower or "aprob" in texto_lower:
+        return (
+            "Para aprobación de crédito, la política indica que esta decisión la realiza exclusivamente el departamento administrativo. "
+            "Como asistente virtual, no puedo aprobar ni confirmar pagos directos; por favor, comuníquese con la oficina administrativa para gestionar la solicitud."
+        )
+
+    if "descuento" in texto_lower:
+        return (
+            "Los descuentos adicionales son: 3% al contado y 1% en crédito aprobado. Ambos se aplican sobre el precio según el rango de volumen del pedido."
+        )
+
+    return (
+        "Sin clave de Google configurada, esta sesión está funcionando en modo local con la información comercial de la empresa. "
+        "La política vigente indica: 1-49 = RD$ 120, 50-99 = RD$ 112, 100-249 = RD$ 105, 250-499 = RD$ 98, 500-999 = RD$ 92 y 1,000+ = RD$ 85. "
+        "También aplica 3% al contado y 1% en crédito aprobado."
+    )
+
+
 def obtener_respuesta_gemini(final_key, user_prompt):
     if not user_prompt or not user_prompt.strip():
         raise ValueError("Escribe una consulta antes de enviar.")
@@ -361,7 +409,7 @@ google_api_key = st.sidebar.text_input(
     type="password",
     key="google_api_key",
     value=clave_automatica,
-    help="Se usa automáticamente desde variables de entorno o secrets si están configuradas."
+    help="Se usa automáticamente desde variables de entorno o secrets si están configuradas. Si no existe, la app sigue funcionando en modo local."
 )
 
 # --- LÓGICA DE NEGOCIO (PRECIOS Y COTIZADOR) ---
@@ -452,19 +500,30 @@ with tab2:
         clave_actual = obtener_clave_google()
         es_valida, mensaje = validar_clave_google(clave_actual)
 
-        if not es_valida:
-            st.warning(f"⚠️ {mensaje}")
-            st.info("Puedes ingresar la API key en la barra lateral o configurarla como GOOGLE_API_KEY en variables de entorno o secrets.")
+        if not clave_actual:
+            with st.spinner("Generando respuesta con información comercial local..."):
+                respuesta = generar_respuesta_local(user_prompt)
+                st.markdown("### Respuesta del Asistente:")
+                st.write(respuesta)
+                st.caption("Modo local activado: no se usa Google API Key.")
         else:
-            with st.spinner("Procesando respuesta con Gemini..."):
-                try:
-                    respuesta = obtener_respuesta_gemini(clave_actual, user_prompt)
+            if not es_valida:
+                st.warning(f"⚠️ {mensaje}")
+                st.info("Se usará la respuesta local porque la clave no es válida o no existe.")
+                with st.spinner("Generando respuesta con información comercial local..."):
+                    respuesta = generar_respuesta_local(user_prompt)
                     st.markdown("### Respuesta del Asistente:")
                     st.write(respuesta)
-                except ValueError as e:
-                    st.error(f"⚠️ {e}")
-                except Exception as e:
-                    st.error(mostrar_error_api(e))
+            else:
+                with st.spinner("Procesando respuesta con Gemini..."):
+                    try:
+                        respuesta = obtener_respuesta_gemini(clave_actual, user_prompt)
+                        st.markdown("### Respuesta del Asistente:")
+                        st.write(respuesta)
+                    except ValueError as e:
+                        st.error(f"⚠️ {e}")
+                    except Exception as e:
+                        st.error(mostrar_error_api(e))
     st.markdown('</div>', unsafe_allow_html=True)
 
 # TAB 3: LISTA DE PRECIOS Y POLÍTICAS
