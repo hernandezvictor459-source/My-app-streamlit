@@ -409,17 +409,18 @@ def mostrar_error_api(error):
     return f"⚠️ No se pudo procesar la consulta. Detalle técnico: {error}"
 
 
-def respuesta_ia(user_prompt):
-    """Genera la respuesta usando Gemini o el modo local de respaldo."""
-    if not user_prompt or not str(user_prompt).strip():
-        return "Escribe una consulta antes de enviar.", "error"
-
-    clave_actual = clave_gemini()
-    es_valida, mensaje = validar_clave_gemini(clave_actual)
-
-    if not clave_actual:
-        return generar_respuesta_local(user_prompt), "local"
-
+def clave_gemini():
+    """Obtiene la API Key de Gemini priorizando la entrada del usuario, luego env vars y secrets."""
+    clave = st.session_state.get("gemini_api_key", "").strip()
+    if not clave:
+        clave = os.environ.get("GEMINI_API_KEY", "").strip()
+    if not clave:
+        try:
+            clave = st.secrets["gemini"]["GEMINI_API_KEY"].strip()
+        except Exception:
+            clave = ""
+    return clave
+    
     if not es_valida:
         st.warning(f"⚠️ {mensaje}")
         st.info("Se usará la respuesta local porque la clave no es válida o no existe.")
