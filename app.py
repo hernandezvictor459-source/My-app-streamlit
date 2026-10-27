@@ -27,6 +27,12 @@ st.set_page_config(
     layout="wide"
 )
 
+# --- SIDEBAR: configuración de API Key para Gemini ---
+with st.sidebar:
+    st.subheader("Configuración")
+    st.text_input("Google API Key", type="password", key="google_api_key")
+    st.caption("La clave se toma desde la sesión, luego de variables de entorno y finalmente de .streamlit/secrets.toml.")
+
 # --- ESTILO VISUAL (tema claro con acento rojo en IA, compacto y ejecutivo) ---
 st.markdown(
     """
@@ -268,7 +274,6 @@ st.markdown(
 )
 
 
-
 def validar_clave_google(clave):
     """Valida formato básico de la clave antes de intentar usarla."""
     if not clave:
@@ -294,7 +299,7 @@ def construir_prompt_usuario(user_prompt):
     2. Descuentos por forma de pago (adicionales):
        - Al contado: 3% adicional.
        - A crédito aprobado: 1% adicional.
-    3. Si el usuario te pregunta sobre aprobación de créditos, aclara amablemente que tú, como IA, no apruebas créditos ni confirmas pagos directos, y que deben comunicarse con el departamento administrativo de la empresa.
+    3. Si el usuario te pregunta sobre aprobación de créditos, aclara amablemente que tú, como IA, no apruebas créditos ni confirmas pagos directos, y que deben comunicarse con el departamento administrativo.
     4. Si te piden redactar un mensaje de cobro o recordatorio de pago atrasado, hazlo de forma cordial, respetuosa y profesional.
     5. Si no tienes información suficiente para responder, dilo con honestidad y sugiere cómo obtenerla.
 
@@ -357,7 +362,6 @@ def obtener_respuesta_gemini(final_key, user_prompt):
     modelos_disponibles = [
         "gemini-2.0-flash",
         "gemini-2.5-flash",
-        "gemini-3.5-flash-lite",
     ]
 
     ultimo_error = None
