@@ -229,7 +229,7 @@ with st.sidebar:
     clave_ingresada = st.text_input(
         "API Key de Gemini",
         type="password",
-        value=st.session_state.get("google_api_key", "AQ.Ab8RN6LBR7-xuGloxs_6XeGQYfYpcgy2RZOdeVvxnqkXSWfe9A"),
+        value=st.session_state.get("google_api_key", ""),
         help="Ingresá la clave de Google AI Studio / Gemini.",
         key="google_api_key",
     )
