@@ -257,7 +257,7 @@ def obtener_clave_google():
     """Obtiene la API Key priorizando entrada del usuario, luego env vars y secrets."""
     clave = st.session_state.get("google_api_key", "")
     if not clave:
-        clave = os.environ.get("GOOGLE_API_KEY", "")
+        clave = os.environ.get("GOOGLE_API_KEY", "GOOGLE_API_KEY")
     if not clave:
         try:
             clave = st.secrets.get("GOOGLE_API_KEY", "")
@@ -265,8 +265,6 @@ def obtener_clave_google():
             clave = ""
     return str(clave).strip() if clave else ""
 
-from google.colab import userdata
-userdata.get('secretName')
 
 def validar_clave_google(clave):
     """Valida formato básico de la clave antes de intentar usarla."""
