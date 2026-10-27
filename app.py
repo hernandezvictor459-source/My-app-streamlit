@@ -3,6 +3,8 @@ import json
 import pandas as pd
 import streamlit as st
 from google import genai
+from google.colab import userdata
+userdata.get('secretName')
 
 # Configuración de página
 st.set_page_config(
