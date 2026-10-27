@@ -1,7 +1,7 @@
 import os
 import streamlit as st
 import pandas as pd
-import google.generativeai as genai
+import google.genai as genai
 
 
 def obtener_clave_google():
