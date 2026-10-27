@@ -8,7 +8,7 @@ def obtener_clave_google():
     """Obtiene la API key automáticamente priorizando secrets de Streamlit, luego variables de entorno."""
     # 1. Intentar obtener de st.secrets de Streamlit (Entorno en la nube/Local secrets.toml)
     try:
-        clave = st.secrets["GEMINI_API_KEY"].strip()
+        clave = st.secrets["GEMINI_API_KEY"].strip("EMINI_API_KEY")
         if clave:
             return clave
     except Exception:
