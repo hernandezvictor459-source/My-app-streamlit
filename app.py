@@ -260,7 +260,7 @@ def obtener_clave_google():
         clave = os.environ.get("GOOGLE_API_KEY", "")
     if not clave:
         try:
-            clave = st.secrets.get("GOOGLE_API_KEY", "AQ.Ab8RN6LBR7-xuGloxs_6XeGQYfYpcgy2RZOdeVvxnqkXSWfe9A")
+            clave = st.secrets.get("GOOGLE_API_KEY", "AQ.Ab8RN6LKe_MLWVAU5K-677dKrNzF7LQysSaRUimT4HQkLM5gag")
         except Exception:
             clave = ""
     return str(clave).strip() if clave else ""
@@ -395,23 +395,6 @@ def mostrar_error_api(error):
         return "⚠️ La solicitud tardó demasiado tiempo. Reintenta más tarde."
     return f"⚠️ No se pudo procesar la consulta. Detalle técnico: {error}"
 
-
-st.sidebar.caption("La clave se guarda solo en la sesión del navegador o en variables de entorno/secrets del servidor.")
-
-st.sidebar.markdown("<div class='panel-light'> <h4>Acceso AI</h4> </div>", unsafe_allow_html=True)
-
-# Carga automática desde variables de entorno o secrets para que el asistente pueda usarse sin pedir la clave cada vez.
-clave_automatica = obtener_clave_google()
-if clave_automatica:
-    st.session_state["google_api_key"] = clave_automatica
-
-google_api_key = st.sidebar.text_input(
-    "Google API Key",
-    type="password",
-    key="google_api_key",
-    value=clave_automatica,
-    help="Se usa automáticamente desde variables de entorno o secrets si están configuradas. Si no existe, la app sigue funcionando en modo local."
-)
 
 # --- LÓGICA DE NEGOCIO (PRECIOS Y COTIZADOR) ---
 def obtener_precio_base(cantidad):
