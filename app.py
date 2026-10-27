@@ -1,24 +1,32 @@
 import os
 import streamlit as st
 import pandas as pd
-import google.genai as genai
-
+from google import genai
+import json
 
 def obtener_clave_google():
-    """Obtiene la API key priorizando entrada del usuario, luego env vars y secrets."""
-    clave = st.session_state.get("google_api_key", "").strip()
+    """Obtiene la API key automáticamente priorizando secrets de Streamlit, luego variables de entorno."""
+    # 1. Intentar obtener de st.secrets de Streamlit (Entorno en la nube/Local secrets.toml)
+    try:
+        clave = st.secrets["GEMINI_API_KEY"].strip()
+        if clave:
+            return clave
+    except Exception:
+        pass
+        
+    try:
+        clave = st.secrets["GOOGLE_API_KEY"].strip()
+        if clave:
+            return clave
+    except Exception:
+        pass
 
+    # 2. Intentar obtener de variables de entorno de OS
+    clave = os.environ.get("GEMINI_API_KEY", "").strip()
     if not clave:
         clave = os.environ.get("GOOGLE_API_KEY", "").strip()
 
-    if not clave:
-        try:
-            clave = st.secrets.get("GOOGLE_API_KEY", "").strip()
-        except Exception:
-            clave = ""
-
     return clave
-
 
 # Configuración de página
 st.set_page_config(
@@ -26,12 +34,6 @@ st.set_page_config(
     page_icon="🥟",
     layout="wide"
 )
-
-# --- SIDEBAR: configuración de API Key para Gemini ---
-with st.sidebar:
-    st.subheader("Configuración")
-    st.text_input("Google API Key", type="password", key="google_api_key")
-    st.caption("La clave se toma desde la sesión, luego de variables de entorno y finalmente de .streamlit/secrets.toml.")
 
 # --- ESTILO VISUAL (tema claro con acento rojo en IA, compacto y ejecutivo) ---
 st.markdown(
@@ -273,7 +275,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-
 def validar_clave_google(clave):
     """Valida formato básico de la clave antes de intentar usarla."""
     if not clave:
@@ -281,7 +282,6 @@ def validar_clave_google(clave):
     if len(clave) < 10:
         return False, "La gemini API Key parece incompleta o inválida."
     return True, ""
-
 
 def construir_prompt_usuario(user_prompt):
     return f"""
@@ -299,13 +299,12 @@ def construir_prompt_usuario(user_prompt):
     2. Descuentos por forma de pago (adicionales):
        - Al contado: 3% adicional.
        - A crédito aprobado: 1% adicional.
-    3. Si el usuario te pregunta sobre aprobación de créditos, aclara amablemente que tú, como IA, no apruebas créditos ni confirmas pagos directos, y que deben comunicarse con el departamento administrativo.
+    3. Si el usuario te pregunta sobre aprobación de créditos, aclara amablemente que tú, como IA, no apruebas créditos ni confirmas pagos directos, y que deben comunicarse con el departamento administrativo de la empresa.
     4. Si te piden redactar un mensaje de cobro o recordatorio de pago atrasado, hazlo de forma cordial, respetuosa y profesional.
     5. Si no tienes información suficiente para responder, dilo con honestidad y sugiere cómo obtenerla.
 
     Consulta del usuario: {user_prompt}
     """
-
 
 def generar_respuesta_local(user_prompt):
     """Respuesta alternativa cuando no hay API key configurada."""
@@ -354,44 +353,27 @@ def generar_respuesta_local(user_prompt):
         "También aplica 3% al contado y 1% en crédito aprobado."
     )
 
-
 def obtener_respuesta_gemini(final_key, user_prompt):
     if not user_prompt or not user_prompt.strip():
         raise ValueError("Escribe una consulta antes de enviar.")
 
-    modelos_disponibles = [
-        "gemini-2.0-flash",
-        "gemini-2.5-flash",
-    ]
-
-    ultimo_error = None
-    client = genai.Client(api_key=final_key)
-
-    for modelo in modelos_disponibles:
-        try:
-            response = client.models.generate_content(
-                model=modelo,
-                contents=construir_prompt_usuario(user_prompt),
-            )
-            texto = getattr(response, "text", "")
-            if not texto or not str(texto).strip():
-                raise ValueError("La API respondió vacía. Intenta nuevamente.")
-            return str(texto).strip()
-        except Exception as e:
-            ultimo_error = e
-            mensaje = str(e).lower()
-            if "404" in str(e) or "not_found" in mensaje:
-                continue
-            raise
-
-    raise RuntimeError(
-        f"No se pudo conectar con ningún modelo disponible de Gemini. Último error: {ultimo_error}"
-    )
-
+    # El SDK moderno de google-genai maneja de forma óptima gemini-2.5-flash para tareas de texto rápidas.
+    modelo_efectivo = "gemini-2.5-flash"
+    try:
+        client_gemini = genai.Client(api_key=final_key)
+        response = client_gemini.models.generate_content(
+            model=modelo_efectivo,
+            contents=construir_prompt_usuario(user_prompt),
+        )
+        texto = getattr(response, "text", "")
+        if not texto or not str(texto).strip():
+            raise ValueError("La API respondió vacía. Intenta nuevamente.")
+        return str(texto).strip()
+    except Exception as e:
+        raise RuntimeError(f"No se pudo conectar con Gemini: {e}")
 
 def mostrar_error_api(error):
     mensaje = str(error).lower()
-
     if "api key" in mensaje or "authentication" in mensaje or "unauthorized" in mensaje or "forbidden" in mensaje:
         return "⚠️ La Google API Key no es válida, no tiene permisos o está vencida."
     if "quota" in mensaje or "rate limit" in mensaje or "too many requests" in mensaje:
@@ -401,7 +383,6 @@ def mostrar_error_api(error):
     if "timeout" in mensaje or "timed out" in mensaje:
         return "⚠️ La solicitud tardó demasiado tiempo. Reintenta más tarde."
     return f"⚠️ No se pudo procesar la consulta. Detalle técnico: {error}"
-
 
 # --- LÓGICA DE NEGOCIO (PRECIOS Y COTIZADOR) ---
 def obtener_precio_base(cantidad):
@@ -419,7 +400,6 @@ def obtener_precio_base(cantidad):
         return 120.0
     return 0.0
 
-
 def calcular_cotizacion(cantidad, forma_pago):
     precio_unitario = obtener_precio_base(cantidad)
     subtotal = cantidad * precio_unitario
@@ -436,8 +416,7 @@ def calcular_cotizacion(cantidad, forma_pago):
 
     return precio_unitario, subtotal, descuento_monto, total, ahorro_total
 
-
-tab1, tab2, tab3 = st.tabs(["📊 Cotizador Mayorista", "🤖 Asistente Virtual con IA", "📜 Lista de Precios y Políticas"])
+tab1, tab2, tab3 = st.tabs(["📊 Cotizador Mayorista", "🦾 Asistente Virtual con IA", "📜 Lista de Precios y Políticas"])
 
 # TAB 1: COTIZADOR
 with tab1:
@@ -461,94 +440,9 @@ with tab1:
 
     with col2:
         precio_unit, sub, desc, total, ahorro = calcular_cotizacion(cantidad, forma_pago)
-
         st.markdown('<div class="panel-light">', unsafe_allow_html=True)
         st.markdown("### Resumen de la Cotización")
         st.metric(label="Total a Pagar", value=f"RD$ {total:,.2f}")
         st.write(f"**Precio por paquete:** {precio_unit:,.2f}")
         st.write(f"**Subtotal inicial:** {sub:,.2f}")
-        st.write(f"**Descuento aplicado:** {desc:,.2f}")
-        if ahorro > 0:
-            st.success(f"🎉 ¡Estás ahorrando RD$ {ahorro:,.2f} comparado con el precio base regular!")
-        st.caption("Nota: Los precios son ficticios y no incluyen impuestos ni transporte.")
-        st.markdown('</div>', unsafe_allow_html=True)
-
-# TAB 2: ASISTENTE VIRTUAL CON IA
-with tab2:
-    st.markdown(
-        '<div class="panel-ia"><div class="assistant-title">🤖 Asistente Virtual con IA</div></div>',
-        unsafe_allow_html=True,
-    )
-    st.markdown(
-        """Puedes consultarle dudas de precios, pedirle sugerencias de compra, o generar recordatorios de pago.
-        *Ejemplo: '¿Cuánto me costarían 500 paquetes pagando al contado?' o 'Redacta un recordatorio amable para un cliente con balance atrasado'.*"""
-    )
-
-    st.markdown('<div class="panel-ia">', unsafe_allow_html=True)
-    user_prompt = st.text_area("¿En qué puedo ayudarte hoy?", height=120, placeholder="Escribe tu consulta aquí...")
-
-    if st.button("Enviar Consulta", use_container_width=True):
-        clave_actual = obtener_clave_google()
-        es_valida, mensaje = validar_clave_google(clave_actual)
-
-        if not clave_actual:
-            with st.spinner("Generando respuesta con información comercial local..."):
-                respuesta = generar_respuesta_local(user_prompt)
-                st.markdown("### Respuesta del Asistente:")
-                st.write(respuesta)
-                st.caption("Modo local activado: no se usa Google API Key.")
-        else:
-            if not es_valida:
-                st.warning(f"⚠️ {mensaje}")
-                st.info("Se usará la respuesta local porque la clave no es válida o no existe.")
-                with st.spinner("Generando respuesta con información comercial local..."):
-                    respuesta = generar_respuesta_local(user_prompt)
-                    st.markdown("### Respuesta del Asistente:")
-                    st.write(respuesta)
-            else:
-                with st.spinner("Procesando respuesta con Gemini..."):
-                    try:
-                        respuesta = obtener_respuesta_gemini(clave_actual, user_prompt)
-                        st.markdown("### Respuesta del Asistente:")
-                        st.write(respuesta)
-                    except ValueError as e:
-                        st.error(f"⚠️ {e}")
-                    except Exception as e:
-                        st.error(mostrar_error_api(e))
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# TAB 3: LISTA DE PRECIOS Y POLÍTICAS
-with tab3:
-    st.markdown('<div class="panel-light"><h3>Políticas Comerciales de Referencia</h3></div>', unsafe_allow_html=True)
-
-    col_t1, col_t2 = st.columns(2)
-    with col_t1:
-        st.subheader("Precios por Volumen")
-        df_precios = pd.DataFrame({
-            "Rango de Paquetes": ["1-49", "50-99", "100-249", "250-499", "500-999", "1,000+"],
-            "Precio por Unidad (RD$)": [120.00, 112.00, 105.00, 98.00, 92.00, 85.00]
-        })
-        st.markdown('<div class="table-wrapper">', unsafe_allow_html=True)
-        st.table(df_precios)
-        st.markdown('</div>', unsafe_allow_html=True)
-
-    with col_t2:
-        st.subheader("Descuentos Adicionales")
-        st.markdown(
-            """- **Al Contado:** 3% de descuento adicional.
-- **Crédito Aprobado:** 1% de descuento adicional.
-- *Ambos descuentos se aplican sobre el precio correspondiente a la escala de volumen.*"""
-        )
-
-    st.markdown(
-        """
-        <div class="panel-light">
-            <strong>Políticas Generales:</strong>
-            <ul>
-                <li>El precio de la cotización final se determina según la escala alcanzada por el total del pedido.</li>
-                <li>Los créditos son autorizados única y exclusivamente por el departamento administrativo de la empresa.</li>
-            </ul>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+        st.write(f
