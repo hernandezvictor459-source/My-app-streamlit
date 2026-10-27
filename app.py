@@ -253,7 +253,7 @@ st.markdown(
 )
 
 # Campo para API key en la barra lateral
-def obtener_clave_google(AQ.Ab8RN6LBR7-xuGloxs_6XeGQYfYpcgy2RZOdeVvxnqkXSWfe9A):
+def obtener_clave_google():
     """Obtiene la API Key priorizando entrada del usuario, luego env vars y secrets."""
     clave = st.session_state.get("google_api_key", "")
     if not clave:
@@ -264,6 +264,9 @@ def obtener_clave_google(AQ.Ab8RN6LBR7-xuGloxs_6XeGQYfYpcgy2RZOdeVvxnqkXSWfe9A):
         except Exception:
             clave = ""
     return str(clave).strip() if clave else ""
+
+from google.colab import userdata
+userdata.get('secretName')
 
 def validar_clave_google(clave):
     """Valida formato básico de la clave antes de intentar usarla."""
