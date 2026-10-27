@@ -251,27 +251,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Campo para API key en la barra lateral
-def obtener_clave_google():
-    """Obtiene la API Key priorizando entrada del usuario, luego env vars y secrets."""
-    clave = st.session_state.get("google_api_key", "")
-    if not clave:
-        clave = os.environ.get("GOOGLE_API_KEY", "")
-    if not clave:
-        try:
-            clave = st.secrets.get("GOOGLE_API_KEY", "")
-        except Exception:
-            clave = "AQ.Ab8RN6J-SWjCvc1AWQsvU6exjG0PxVYHZaptNi98lHe9-GHelw"
-    return str(clave).strip() if clave else ""
-
-
-def validar_clave_google(clave):
-    """Valida formato básico de la clave antes de intentar usarla."""
-    if not clave:
-        return False, "No hay una Google API Key disponible."
-    if len(clave) < 10:
-        return False, "La gemini API Key parece incompleta o inválida."
-    return True, ""
 
 
 def construir_prompt_usuario(user_prompt):
