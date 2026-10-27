@@ -1,31 +1,39 @@
 import os
 import streamlit as st
 import pandas as pd
-from google import genai
+
+try:
+    from google import genai
+except Exception:
+    genai = None
+
 import json
 
 
 def obtener_clave_google():
     """Obtiene la API key automáticamente priorizando secrets de Streamlit, luego variables de entorno."""
-    try:
-        clave = st.secrets["GEMINI_API_KEY"].strip()
-        if clave:
-            return clave
-    except Exception:
-        pass
+    claves = [
+        "GEMINI_API_KEY",
+        "GOOGLE_API_KEY",
+        "GENAI_API_KEY",
+    ]
 
-    try:
-        clave = st.secrets["GOOGLE_API_KEY"].strip()
-        if clave:
-            return clave
-    except Exception:
-        pass
+    for nombre in claves:
+        try:
+            valor = st.secrets.get(nombre, "")
+            if isinstance(valor, str):
+                valor = valor.strip()
+            if valor:
+                return str(valor)
+        except Exception:
+            pass
 
-    clave = os.environ.get("GEMINI_API_KEY", "").strip()
-    if not clave:
-        clave = os.environ.get("GOOGLE_API_KEY", "").strip()
+    for nombre in claves:
+        valor = os.environ.get(nombre, "").strip()
+        if valor:
+            return valor
 
-    return clave
+    return ""
 
 
 st.set_page_config(
@@ -277,7 +285,7 @@ def validar_clave_google(clave):
     if not clave:
         return False, "No hay una Google API Key disponible."
     if len(clave) < 10:
-        return False, "La gemini API Key parece incompleta o inválida."
+        return False, "La Gemini API Key parece incompleta o inválida."
     return True, ""
 
 
@@ -357,18 +365,46 @@ def obtener_respuesta_gemini(final_key, user_prompt):
     if not user_prompt or not user_prompt.strip():
         raise ValueError("Escribe una consulta antes de enviar.")
 
+    if not final_key:
+        raise ValueError("No hay una API key de Gemini disponible.")
+
+    if genai is None:
+        raise RuntimeError("El paquete 'google-genai' no está instalado. Instálalo con: pip install google-genai")
+
     modelo_efectivo = "gemini-2.5-flash"
+    prompt = construir_prompt_usuario(user_prompt)
+
     try:
-        client_gemini = genai.Client(api_key=final_key)
-        response = client_gemini.models.generate_content(
+        client = genai.Client(api_key=final_key)
+        response = client.models.generate_content(
             model=modelo_efectivo,
-            contents=construir_prompt_usuario(user_prompt),
+            contents=prompt,
         )
+
         texto = getattr(response, "text", "")
-        if not texto or not str(texto).strip():
-            raise ValueError("La API respondió vacía. Intenta nuevamente.")
-        return str(texto).strip()
+        if texto is None:
+            texto = ""
+
+        if isinstance(texto, str) and texto.strip():
+            return texto.strip()
+
+        if isinstance(response, dict):
+            texto = response.get("text") or response.get("content")
+            if isinstance(texto, str) and texto.strip():
+                return texto.strip()
+
+        raise ValueError("La API respondió vacía o sin contenido útil.")
+
     except Exception as e:
+        mensaje = str(e).lower()
+        if "api key" in mensaje or "authentication" in mensaje or "unauthorized" in mensaje or "forbidden" in mensaje:
+            raise RuntimeError("La Google API Key no es válida, no tiene permisos o está vencida.")
+        if "model" in mensaje and "not found" in mensaje:
+            raise RuntimeError("El modelo solicitado no está disponible para esta cuenta.")
+        if "quota" in mensaje or "rate limit" in mensaje or "too many requests" in mensaje:
+            raise RuntimeError("La API de Gemini está temporalmente sobrecargada o excedió su cuota. Intenta más tarde.")
+        if "timeout" in mensaje or "timed out" in mensaje:
+            raise RuntimeError("La solicitud tardó demasiado tiempo. Reintenta más tarde.")
         raise RuntimeError(f"No se pudo conectar con Gemini: {e}")
 
 
