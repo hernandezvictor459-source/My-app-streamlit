@@ -264,7 +264,6 @@ def obtener_clave_google():
             clave = ""
     return str(clave).strip() if clave else ""
 
-
 def validar_clave_google(clave):
     """Valida formato básico de la clave antes de intentar usarla."""
     if not clave:
