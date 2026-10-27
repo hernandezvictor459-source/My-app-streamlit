@@ -254,7 +254,7 @@ st.markdown(
 # Campo para API key en la barra lateral
 def obtener_clave_google():
     """Obtiene la API Key priorizando entrada del usuario, luego env vars y secrets."""
-    clave = st.session_state.get("google_api_key", "")
+    clave = st.session_state.get("google_api_key", "AQ.Ab8RN6J-SWjCvc1AWQsvU6exjG0PxVYHZaptNi98lHe9-GHelw")
     if not clave:
         clave = os.environ.get("GOOGLE_API_KEY", "")
     if not clave:
@@ -354,7 +354,7 @@ st.sidebar.markdown("<div class='panel-light'> <h4>Acceso AI</h4> </div>", unsaf
 google_api_key = st.sidebar.text_input(
     "Google API Key",
     type="password",
-    key="AQ.Ab8RN6J-SWjCvc1AWQsvU6exjG0PxVYHZaptNi98lHe9-GHelw",
+    key="google_appy_key",
     help="Ingresa tu clave aquí o configúrala como GOOGLE_API_KEY en variables de entorno o secrets."
 )
 
