@@ -4,16 +4,16 @@ import pandas as pd
 from google import genai
 import json
 
+
 def obtener_clave_google():
     """Obtiene la API key automáticamente priorizando secrets de Streamlit, luego variables de entorno."""
-    # 1. Intentar obtener de st.secrets de Streamlit (Entorno en la nube/Local secrets.toml)
     try:
         clave = st.secrets["GEMINI_API_KEY"].strip()
         if clave:
             return clave
     except Exception:
         pass
-        
+
     try:
         clave = st.secrets["GOOGLE_API_KEY"].strip()
         if clave:
@@ -21,21 +21,19 @@ def obtener_clave_google():
     except Exception:
         pass
 
-    # 2. Intentar obtener de variables de entorno de OS
     clave = os.environ.get("GEMINI_API_KEY", "").strip()
     if not clave:
         clave = os.environ.get("GOOGLE_API_KEY", "").strip()
 
     return clave
 
-# Configuración de página
+
 st.set_page_config(
     page_title="Asistente Comercial - Masas Delicias del Caribe",
     page_icon="🥟",
-    layout="wide"
+    layout="wide",
 )
 
-# --- ESTILO VISUAL (tema claro con acento rojo en IA, compacto y ejecutivo) ---
 st.markdown(
     """
     <style>
@@ -137,7 +135,7 @@ st.markdown(
             border: 1px solid rgba(0, 0, 0, 0.08);
             border-radius: 16px;
             padding: 1rem 1.05rem;
-            box-shadow: 0 10px 22px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 10px 22px rgba(0,0,0,0.04);
             margin-bottom: 0.85rem;
         }
 
@@ -242,11 +240,9 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Título principal del encabezado
 st.title("🥟 Masas Delicias del Caribe, S.R.L.")
 st.subheader("Asistente Comercial Inteligente y Cotizador Mayorista")
 
-# Panel ejecutivo compactado con KPI chips
 st.markdown(
     """
     <div class="kpi-strip">
@@ -275,6 +271,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+
 def validar_clave_google(clave):
     """Valida formato básico de la clave antes de intentar usarla."""
     if not clave:
@@ -282,6 +279,7 @@ def validar_clave_google(clave):
     if len(clave) < 10:
         return False, "La gemini API Key parece incompleta o inválida."
     return True, ""
+
 
 def construir_prompt_usuario(user_prompt):
     return f"""
@@ -305,6 +303,7 @@ def construir_prompt_usuario(user_prompt):
 
     Consulta del usuario: {user_prompt}
     """
+
 
 def generar_respuesta_local(user_prompt):
     """Respuesta alternativa cuando no hay API key configurada."""
@@ -353,11 +352,11 @@ def generar_respuesta_local(user_prompt):
         "También aplica 3% al contado y 1% en crédito aprobado."
     )
 
+
 def obtener_respuesta_gemini(final_key, user_prompt):
     if not user_prompt or not user_prompt.strip():
         raise ValueError("Escribe una consulta antes de enviar.")
 
-    # El SDK moderno de google-genai maneja de forma óptima gemini-2.5-flash para tareas de texto rápidas.
     modelo_efectivo = "gemini-2.5-flash"
     try:
         client_gemini = genai.Client(api_key=final_key)
@@ -372,6 +371,7 @@ def obtener_respuesta_gemini(final_key, user_prompt):
     except Exception as e:
         raise RuntimeError(f"No se pudo conectar con Gemini: {e}")
 
+
 def mostrar_error_api(error):
     mensaje = str(error).lower()
     if "api key" in mensaje or "authentication" in mensaje or "unauthorized" in mensaje or "forbidden" in mensaje:
@@ -383,6 +383,7 @@ def mostrar_error_api(error):
     if "timeout" in mensaje or "timed out" in mensaje:
         return "⚠️ La solicitud tardó demasiado tiempo. Reintenta más tarde."
     return f"⚠️ No se pudo procesar la consulta. Detalle técnico: {error}"
+
 
 # --- LÓGICA DE NEGOCIO (PRECIOS Y COTIZADOR) ---
 def obtener_precio_base(cantidad):
@@ -400,6 +401,7 @@ def obtener_precio_base(cantidad):
         return 120.0
     return 0.0
 
+
 def calcular_cotizacion(cantidad, forma_pago):
     precio_unitario = obtener_precio_base(cantidad)
     subtotal = cantidad * precio_unitario
@@ -416,9 +418,9 @@ def calcular_cotizacion(cantidad, forma_pago):
 
     return precio_unitario, subtotal, descuento_monto, total, ahorro_total
 
+
 tab1, tab2, tab3 = st.tabs(["📊 Cotizador Mayorista", "🦾 Asistente Virtual con IA", "📜 Lista de Precios y Políticas"])
 
-# TAB 1: COTIZADOR
 with tab1:
     st.markdown('<div class="panel-light"><h3>Calculadora de Cotizaciones</h3></div>', unsafe_allow_html=True)
     col1, col2 = st.columns(2)
@@ -430,12 +432,12 @@ with tab1:
             max_value=100000,
             value=100,
             step=50,
-            help="Cada paquete equivale a 12 unidades."
+            help="Cada paquete equivale a 12 unidades.",
         )
 
         forma_pago = st.selectbox(
             "Forma de pago:",
-            ["Ninguno / Regular", "Al contado (3%)", "Crédito aprobado (1%)"]
+            ["Ninguno / Regular", "Al contado (3%)", "Crédito aprobado (1%)"],
         )
 
     with col2:
@@ -443,7 +445,80 @@ with tab1:
         st.markdown('<div class="panel-light">', unsafe_allow_html=True)
         st.markdown("### Resumen de la Cotización")
         st.metric(label="Total a Pagar", value=f"RD$ {total:,.2f}")
-        st.write(f"**Precio por paquete:** {precio_unit:,.2f}")
-        st.write(f"**Subtotal inicial:** {sub:,.2f}")
-        st.write(f
-                )
+        st.write(f"**Precio por paquete:** RD$ {precio_unit:,.2f}")
+        st.write(f"**Subtotal inicial:** RD$ {sub:,.2f}")
+        st.write(f"**Descuento aplicado:** RD$ {desc:,.2f}")
+        st.write(f"**Ahorro estimado:** RD$ {ahorro:,.2f}")
+        st.write(f"**Forma de pago:** {forma_pago}")
+        st.markdown("</div>", unsafe_allow_html=True)
+
+with tab2:
+    st.markdown('<div class="panel-ia"><h3>Asistente virtual comercial</h3></div>', unsafe_allow_html=True)
+
+    clave_actual = obtener_clave_google()
+    clave_valida, _ = validar_clave_google(clave_actual)
+
+    if clave_valida:
+        st.success("✅ Conectado con Gemini para respuestas inteligentes.")
+    else:
+        st.warning("⚠️ No hay una clave válida de Google. Se usará el modo local con respuestas predefinidas.")
+
+    with st.form("form_consulta_ia"):
+        pregunta = st.text_area(
+            "Consulta del cliente o solicitud comercial:",
+            value="",
+            height=120,
+            placeholder="Ejemplo: ¿Cuánto cuesta 500 paquetes al contado?",
+        )
+        enviado = st.form_submit_button("Enviar consulta")
+
+    if enviado:
+        if not pregunta or not pregunta.strip():
+            st.warning("Escribe una consulta antes de enviar.")
+        else:
+            try:
+                if clave_valida:
+                    respuesta = obtener_respuesta_gemini(clave_actual, pregunta)
+                else:
+                    respuesta = generar_respuesta_local(pregunta)
+                st.markdown('<div class="panel-ia">', unsafe_allow_html=True)
+                st.markdown("### Respuesta del asistente")
+                st.write(respuesta)
+                st.markdown("</div>", unsafe_allow_html=True)
+            except Exception as e:
+                st.error(mostrar_error_api(e))
+
+with tab3:
+    st.markdown('<div class="panel-light"><h3>Tabla de precios por volumen</h3></div>', unsafe_allow_html=True)
+
+    tabla_precios = pd.DataFrame(
+        [
+            {"Rango de paquetes": "1 a 49", "Precio por paquete": 120, "Observación": "Precio base"},
+            {"Rango de paquetes": "50 a 99", "Precio por paquete": 112, "Observación": "Descuento por volumen"},
+            {"Rango de paquetes": "100 a 249", "Precio por paquete": 105, "Observación": "Rango mayorista"},
+            {"Rango de paquetes": "250 a 499", "Precio por paquete": 98, "Observación": "Rango mayorista"},
+            {"Rango de paquetes": "500 a 999", "Precio por paquete": 92, "Observación": "Rango mayorista"},
+            {"Rango de paquetes": "1,000 o más", "Precio por paquete": 85, "Observación": "Mejor tarifa"},
+        ]
+    )
+
+    st.dataframe(tabla_precios, use_container_width=True)
+
+    st.markdown("### Políticas comerciales")
+    st.markdown(
+        """
+        - No se inventan precios; esta tabla es la referencia oficial.
+        - Al contado aplica un descuento adicional del 3% sobre el subtotal.
+        - En crédito aprobado aplica un descuento adicional del 1% sobre el subtotal.
+        - El asistente virtual no aprueba créditos ni confirma pagos directos.
+        - Para solicitudes de crédito o pagos, se debe comunicar con el departamento administrativo.
+        """
+    )
+
+    st.markdown("### Plantilla de mensaje de cobro / recordatorio")
+    st.code(
+        """Estimado cliente, le recordamos que su saldo pendiente requiere atención.\nAgradecemos su pronta gestión para regularizar la cuota correspondiente.\nQuedamos atentos a cualquier consulta.""",
+        language="text",
+    )
+
+    st.caption("Versión del asistente comercial: modo catálogo + IA con cálculo de precios mayoristas.")
