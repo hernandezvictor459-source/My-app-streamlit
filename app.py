@@ -507,22 +507,20 @@ with tab1:
 
 # TAB 2: ASISTENTE VIRTUAL CON IA
 with tab2:
-    st.markdown(
-        '<div class="panel-ia"><div class="assistant-title">🤖 Asistente Virtual con IA</div></div>',
-        unsafe_allow_html=True,
-    )
-    st.markdown(
-        """Puedes consultarle dudas de precios, pedirle sugerencias de compra, o generar recordatorios de pago.
-        *Ejemplo: '¿Cuánto me costarían 500 paquetes pagando al contado?' o 'Redacta un recordatorio amable para un cliente con balance atrasado'.*"""
-    )
-
+    st.markdown(...)
+    st.markdown(""" ... """)
+    
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = []
-
+    
     for mensaje in st.session_state.chat_history:
         with st.chat_message(mensaje["role"]):
             st.write(mensaje["content"])
 
+    user_prompt = st.chat_input("Escribí tu consulta aquí...")
+
+    if user_prompt:
+        ...
     user_prompt = st.chat_input("Escribí tu consulta aquí...")
 
    if user_prompt:
