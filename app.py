@@ -1,32 +1,25 @@
 import os
-import streamlit as st
-import pandas as pd
-from google import genai
 import json
+import pandas as pd
+import streamlit as st
+from google import genai
+
 
 def obtener_clave_google():
-    """Obtiene la API key automáticamente priorizando secrets de Streamlit, luego variables de entorno."""
-    # 1. Intentar obtener de st.secrets de Streamlit (Entorno en la nube/Local secrets.toml)
-    try:
-        clave = st.secrets["GEMINI_API_KEY"].strip("EMINI_API_KEY")
-        if clave:
-            return clave
-    except Exception:
-        pass
+    """Obtiene la API key priorizando entrada del usuario, luego env vars y secrets."""
+    clave = st.session_state.get("google_api_key", "").strip()
 
-    try:
-        clave = st.secrets["GOOGLE_API_KEY"].strip()
-        if clave:
-            return clave
-    except Exception:
-        pass
-
-    # 2. Intentar obtener de variables de entorno de OS
-    clave = os.environ.get("GEMINI_API_KEY", "").strip()
     if not clave:
         clave = os.environ.get("GOOGLE_API_KEY", "").strip()
 
+    if not clave:
+        try:
+            clave = st.secrets.get("GOOGLE_API_KEY", "").strip()
+        except Exception:
+            clave = ""
+
     return clave
+
 
 # Configuración de página
 st.set_page_config(
@@ -71,7 +64,8 @@ st.markdown(
         .stTabs [role="tab"][aria-selected="true"] {
             background: linear-gradient(180deg, #a51c1c 0%, #731010 100%);
             color: #ffffff;
-            border-color: rgba(0, 0, 0, 0.08);            box-shadow: 0 8px 18px rgba(100, 18, 18, 0.18);
+            border-color: rgba(0, 0, 0, 0.08);
+            box-shadow: 0 8px 18px rgba(100, 18, 18, 0.18);
         }
 
         h1 {
@@ -274,6 +268,21 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+# Campo para API key en la barra lateral
+def obtener_clave_google():
+    """Obtiene la API Key priorizando entrada del usuario, luego env vars y secrets."""
+    clave = st.session_state.get("google_api_key", "google_api_key")
+    if not clave:
+        clave = os.environ.get("GOOGLE_API_KEY", ("GOOGLE_API_KEY")
+    if not clave:
+        try:
+            clave = st.secrets.get("GOOGLE_API_KEY"), ("AQ.Ab8RN6LBR7-xuGloxs_6XeGQYfYpcgy2RZOdeVvxnqkXSWfe9A")
+        except Exception:
+            clave = ""
+    return str(clave).strip() if clave else ""
+
+
+
 def validar_clave_google(clave):
     """Valida formato básico de la clave antes de intentar usarla."""
     if not clave:
@@ -281,6 +290,7 @@ def validar_clave_google(clave):
     if len(clave) < 10:
         return False, "La gemini API Key parece incompleta o inválida."
     return True, ""
+
 
 def construir_prompt_usuario(user_prompt):
     return f"""
@@ -298,12 +308,13 @@ def construir_prompt_usuario(user_prompt):
     2. Descuentos por forma de pago (adicionales):
        - Al contado: 3% adicional.
        - A crédito aprobado: 1% adicional.
-    3. Si el usuario te pregunta sobre aprobación de créditos, aclara amablemente que tú, como IA, no apruebas créditos ni confiras pagos directos, y que deben comunicarse con el departamento administrativo de la empresa.
+    3. Si el usuario te pregunta sobre aprobación de créditos, aclara amablemente que tú, como IA, no apruebas créditos ni confirmas pagos directos, y que deben comunicarse con el departamento administrativo de la empresa.
     4. Si te piden redactar un mensaje de cobro o recordatorio de pago atrasado, hazlo de forma cordial, respetuosa y profesional.
     5. Si no tienes información suficiente para responder, dilo con honestidad y sugiere cómo obtenerla.
 
     Consulta del usuario: {user_prompt}
     """
+
 
 def generar_respuesta_local(user_prompt):
     """Respuesta alternativa cuando no hay API key configurada."""
@@ -352,26 +363,45 @@ def generar_respuesta_local(user_prompt):
         "También aplica 3% al contado y 1% en crédito aprobado."
     )
 
+
 def obtener_respuesta_gemini(final_key, user_prompt):
     if not user_prompt or not user_prompt.strip():
         raise ValueError("Escribe una consulta antes de enviar.")
 
-    modelo_efectivo = "gemini-2.5-flash"
-    try:
-        client_gemini = genai.Client(api_key=final_key)
-        response = client_gemini.models.generate_content(
-            model=modelo_efectivo,
-            contents=construir_prompt_usuario(user_prompt),
-        )
-        texto = getattr(response, "text", "")
-        if not texto or not str(texto).strip():
-            raise ValueError("La API respondió vacía. Intenta nuevamente.")
-        return str(texto).strip()
-    except Exception as e:
-        raise RuntimeError(f"No se pudo conectar con Gemini: {e}")
+    modelos_disponibles = [
+        "gemini-2.0-flash",
+        "gemini-2.5-flash",
+        "gemini-3.5-flash-lite",
+    ]
+
+    ultimo_error = None
+    client = genai.Client(api_key=final_key)
+
+    for modelo in modelos_disponibles:
+        try:
+            response = client.models.generate_content(
+                model=modelo,
+                contents=construir_prompt_usuario(user_prompt),
+            )
+            texto = getattr(response, "text", "")
+            if not texto or not str(texto).strip():
+                raise ValueError("La API respondió vacía. Intenta nuevamente.")
+            return str(texto).strip()
+        except Exception as e:
+            ultimo_error = e
+            mensaje = str(e).lower()
+            if "404" in str(e) or "not_found" in mensaje:
+                continue
+            raise
+
+    raise RuntimeError(
+        f"No se pudo conectar con ningún modelo disponible de Gemini. Último error: {ultimo_error}"
+    )
+
 
 def mostrar_error_api(error):
     mensaje = str(error).lower()
+
     if "api key" in mensaje or "authentication" in mensaje or "unauthorized" in mensaje or "forbidden" in mensaje:
         return "⚠️ La Google API Key no es válida, no tiene permisos o está vencida."
     if "quota" in mensaje or "rate limit" in mensaje or "too many requests" in mensaje:
@@ -381,6 +411,7 @@ def mostrar_error_api(error):
     if "timeout" in mensaje or "timed out" in mensaje:
         return "⚠️ La solicitud tardó demasiado tiempo. Reintenta más tarde."
     return f"⚠️ No se pudo procesar la consulta. Detalle técnico: {error}"
+
 
 # --- LÓGICA DE NEGOCIO (PRECIOS Y COTIZADOR) ---
 def obtener_precio_base(cantidad):
@@ -398,6 +429,7 @@ def obtener_precio_base(cantidad):
         return 120.0
     return 0.0
 
+
 def calcular_cotizacion(cantidad, forma_pago):
     precio_unitario = obtener_precio_base(cantidad)
     subtotal = cantidad * precio_unitario
@@ -414,7 +446,8 @@ def calcular_cotizacion(cantidad, forma_pago):
 
     return precio_unitario, subtotal, descuento_monto, total, ahorro_total
 
-tab1, tab2, tab3 = st.tabs(["📊 Cotizador Mayorista", "🦾 Asistente Virtual con IA", "📜 Lista de Precios y Políticas"])
+
+tab1, tab2, tab3 = st.tabs(["📊 Cotizador Mayorista", "🤖 Asistente Virtual con IA", "📜 Lista de Precios y Políticas"])
 
 # TAB 1: COTIZADOR
 with tab1:
@@ -438,6 +471,7 @@ with tab1:
 
     with col2:
         precio_unit, sub, desc, total, ahorro = calcular_cotizacion(cantidad, forma_pago)
+
         st.markdown('<div class="panel-light">', unsafe_allow_html=True)
         st.markdown("### Resumen de la Cotización")
         st.metric(label="Total a Pagar", value=f"RD$ {total:,.2f}")
@@ -446,7 +480,7 @@ with tab1:
         st.write(f"**Descuento aplicado:** {desc:,.2f}")
         if ahorro > 0:
             st.success(f"🎉 ¡Estás ahorrando RD$ {ahorro:,.2f} comparado con el precio base regular!")
-        st.caption("Nota: Los precios son de referencia y no incluyen impuestos ni transporte.")
+        st.caption("Nota: Los precios son ficticios y no incluyen impuestos ni transporte.")
         st.markdown('</div>', unsafe_allow_html=True)
 
 # TAB 2: ASISTENTE VIRTUAL CON IA
