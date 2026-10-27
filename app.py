@@ -253,7 +253,7 @@ st.markdown(
 )
 
 # Campo para API key en la barra lateral
-def obtener_clave_google():
+def obtener_clave_google(AQ.Ab8RN6LBR7-xuGloxs_6XeGQYfYpcgy2RZOdeVvxnqkXSWfe9A):
     """Obtiene la API Key priorizando entrada del usuario, luego env vars y secrets."""
     clave = st.session_state.get("google_api_key", "")
     if not clave:
