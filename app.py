@@ -414,7 +414,7 @@ def respuesta_ia(user_prompt):
     if not user_prompt or not str(user_prompt).strip():
         return "Escribe una consulta antes de enviar.", "error"
 
-    clave_actual = validar_clave_gemini()
+    clave_actual = clave_gemini()
     es_valida, mensaje = validar_clave_google(clave_actual)
 
     if not clave_actual:
