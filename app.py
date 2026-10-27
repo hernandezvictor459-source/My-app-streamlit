@@ -268,7 +268,7 @@ st.markdown(
 # Campo para API key en la barra lateral
 def obtener_clave_google():
     """Obtiene la API Key de Gemini priorizando la entrada del usuario, luego env vars y secrets."""
-    clave = st.session_state.get("gmini_api_key", "").strip()
+    clave = st.session_state.get("google_api_key", "").strip()
     if not clave:
         clave = os.environ.get("GOOGLE_API_KEY", "").strip()
     if not clave:
@@ -304,7 +304,7 @@ def construir_prompt_usuario(user_prompt):
     2. Descuentos por forma de pago (adicionales):
        - Al contado: 3% adicional.
        - A crédito aprobado: 1% adicional.
-    3. Si el usuario te pregunta sobre aprobación de créditos, aclara amablemente que tú, como IA, no apruebas créditos ni confirmas pagos directos, y que deben comunicarse con el departamento administrativo para gestionar la solicitud.
+    3. Si el usuario te pregunta sobre aprobación de créditos, aclara amablemente que tú, como IA, no apruebas créditos ni confirmas pagos directos, y que deben comunicarse con el departamento administrativo.
     4. Si te piden redactar un mensaje de cobro o recordatorio de pago atrasado, hazlo de forma cordial, respetuosa y profesional.
     5. Si no tienes información suficiente para responder, dilo con honestidad y sugiere cómo obtenerla.
 
@@ -409,6 +409,31 @@ def mostrar_error_api(error):
     return f"⚠️ No se pudo procesar la consulta. Detalle técnico: {error}"
 
 
+def respuesta_ia(user_prompt):
+    """Genera la respuesta usando Gemini o el modo local de respaldo."""
+    if not user_prompt or not str(user_prompt).strip():
+        return "Escribe una consulta antes de enviar.", "error"
+
+    clave_actual = obtener_clave_google()
+    es_valida, mensaje = validar_clave_google(clave_actual)
+
+    if not clave_actual:
+        return generar_respuesta_local(user_prompt), "local"
+
+    if not es_valida:
+        st.warning(f"⚠️ {mensaje}")
+        st.info("Se usará la respuesta local porque la clave no es válida o no existe.")
+        return generar_respuesta_local(user_prompt), "local"
+
+    try:
+        respuesta = obtener_respuesta_gemini(clave_actual, user_prompt)
+        return respuesta, "gemini"
+    except ValueError as e:
+        return str(e), "error"
+    except Exception as e:
+        return mostrar_error_api(e), "error"
+
+
 # --- LÓGICA DE NEGOCIO (PRECIOS Y COTIZADOR) ---
 def obtener_precio_base(cantidad):
     if cantidad >= 1000:
@@ -490,38 +515,32 @@ with tab2:
         *Ejemplo: '¿Cuánto me costarían 500 paquetes pagando al contado?' o 'Redacta un recordatorio amable para un cliente con balance atrasado'.*"""
     )
 
-    st.markdown('<div class="panel-ia">', unsafe_allow_html=True)
-    user_prompt = st.text_area("¿En qué puedo ayudarte hoy?", height=120, placeholder="Escribe tu consulta aquí...")
+    if "chat_history" not in st.session_state:
+        st.session_state.chat_history = []
 
-    if st.button("Enviar Consulta", use_container_width=True):
-        clave_actual = obtener_clave_google()
-        es_valida, mensaje = validar_clave_google(clave_actual)
+    for mensaje in st.session_state.chat_history:
+        with st.chat_message(mensaje["role"]):
+            st.write(mensaje["content"])
 
-        if not clave_actual:
-            with st.spinner("Generando respuesta con información comercial local..."):
-                respuesta = generar_respuesta_local(user_prompt)
-                st.markdown("### Respuesta del Asistente:")
-                st.write(respuesta)
-                st.caption("Modo local activado: no se usa la Gemini API Key.")
-        else:
-            if not es_valida:
-                st.warning(f"⚠️ {mensaje}")
-                st.info("Se usará la respuesta local porque la clave no es válida o no existe.")
-                with st.spinner("Generando respuesta con información comercial local..."):
-                    respuesta = generar_respuesta_local(user_prompt)
-                    st.markdown("### Respuesta del Asistente:")
-                    st.write(respuesta)
-            else:
-                with st.spinner("Procesando respuesta con Gemini..."):
-                    try:
-                        respuesta = obtener_respuesta_gemini(clave_actual, user_prompt)
-                        st.markdown("### Respuesta del Asistente:")
-                        st.write(respuesta)
-                    except ValueError as e:
-                        st.error(f"⚠️ {e}")
-                    except Exception as e:
-                        st.error(mostrar_error_api(e))
-    st.markdown('</div>', unsafe_allow_html=True)
+    user_prompt = st.chat_input("Escribí tu consulta aquí...")
+
+    if user_prompt:
+        st.session_state.chat_history.append({"role": "user", "content": user_prompt})
+        with st.chat_message("user"):
+            st.write(user_prompt)
+
+        with st.chat_message("assistant"):
+            with st.spinner("Pensando..."):
+                respuesta, _ = respuesta_ia(user_prompt)
+            st.write(respuesta)
+
+        st.session_state.chat_history.append({"role": "assistant", "content": respuesta})
+
+    col_limpiar, _ = st.columns([1, 3])
+    with col_limpiar:
+        if st.button("Reiniciar conversación", use_container_width=True):
+            st.session_state.chat_history = []
+            st.rerun()
 
 # TAB 3: LISTA DE PRECIOS Y POLÍTICAS
 with tab3:
