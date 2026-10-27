@@ -266,14 +266,14 @@ st.markdown(
 )
 
 # Campo para API key en la barra lateral
-def obtener_clave_google():
+def obtener_clave_gemini():
     """Obtiene la API Key de Gemini priorizando la entrada del usuario, luego env vars y secrets."""
-    clave = st.session_state.get("google_api_key", "").strip()
+    clave = st.session_state.get("gemini_api_key", "").strip()
     if not clave:
-        clave = os.environ.get("GOOGLE_API_KEY", "").strip()
+        clave = os.environ.get("GEMINI_API_KEY", "").strip()
     if not clave:
         try:
-            clave = st.secrets["google"]["GOOGLE_API_KEY"].strip()
+            clave = st.secrets["gemini"]["GEMINI_API_KEY"].strip()
         except Exception:
             clave = ""
     return clave
