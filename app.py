@@ -279,7 +279,7 @@ def obtener_clave_gemini():
     return clave
 
 
-def validar_clave_google(clave):
+def validar_clave_gemini(clave):
     """Valida formato básico de la clave antes de intentar usarla."""
     if not clave:
         return False, "No hay una Gemini API Key disponible."
@@ -415,7 +415,7 @@ def respuesta_ia(user_prompt):
         return "Escribe una consulta antes de enviar.", "error"
 
     clave_actual = clave_gemini()
-    es_valida, mensaje = validar_clave_google(clave_actual)
+    es_valida, mensaje = validar_clave_gemini(clave_actual)
 
     if not clave_actual:
         return generar_respuesta_local(user_prompt), "local"
