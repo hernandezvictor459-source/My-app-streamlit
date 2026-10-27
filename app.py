@@ -276,7 +276,7 @@ def obtener_clave_google():
         clave = os.environ.get("GOOGLE_API_KEY", ("GOOGLE_API_KEY")
     if not clave:
         try:
-            clave = st.secrets.get("GOOGLE_API_KEY"), ("AQ.Ab8RN6LBR7-xuGloxs_6XeGQYfYpcgy2RZOdeVvxnqkXSWfe9A")
+            clave = st.secrets.get("GOOGLE_API_KEY"), ("")
         except Exception:
             clave = ""
     return str(clave).strip() if clave else ""
