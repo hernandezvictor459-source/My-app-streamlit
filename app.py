@@ -415,7 +415,7 @@ def respuesta_ia(user_prompt):
         return "Escribe una consulta antes de enviar.", "error"
 
     clave_actual = obtener_clave_gemini()
-    es_valida, mensaje = validar_clave_gemini(clave_actual)
+    es_valida, mensaje = validar_clave_google(clave_actual)
 
     if not clave_actual:
         return generar_respuesta_local(user_prompt), "local"
