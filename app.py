@@ -229,12 +229,12 @@ with st.sidebar:
     clave_ingresada = st.text_input(
         "API Key de Gemini",
         type="password",
-        value=st.session_state.get("google_api_key", ""),
+        value=st.session_state.get("google_api_key", "google_api_key"),
         help="Ingresá la clave de Google AI Studio / Gemini.",
         key="google_api_key",
     )
     if clave_ingresada:
-        st.session_state["google_api_key"] = clave_ingresada.strip(AQ.Ab8RN6LBR7-xuGloxs_6XeGQYfYpcgy2RZOdeVvxnqkXSWfe9A)
+        st.session_state["google_api_key"] = clave_ingresada.strip()
 
 # Panel ejecutivo compactado con KPI chips
 st.markdown(
