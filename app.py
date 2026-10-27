@@ -1,8 +1,20 @@
 import os
-import json
-import pandas as pd
 import streamlit as st
-from google import genai
+
+def obtener_clave_google():
+    """Obtiene la API key priorizando entrada del usuario, luego env vars y secrets."""
+    clave = st.session_state.get("google_api_key", "").strip()
+
+    if not clave:
+        clave = os.environ.get("GOOGLE_API_KEY", "").strip()
+
+    if not clave:
+        try:
+            clave = st.secrets.get("GOOGLE_API_KEY", "").strip()
+        except Exception:
+            clave = ""
+
+    return clave
 
 
 # Configuración de página
