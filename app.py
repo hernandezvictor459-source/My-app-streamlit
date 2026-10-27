@@ -525,18 +525,17 @@ with tab2:
 
     user_prompt = st.chat_input("Escribí tu consulta aquí...")
 
-    if user_prompt:
-        st.session_state.chat_history.append({"role": "user", "content": user_prompt})
-        with st.chat_message("user"):
-            st.write(user_prompt)
+   if user_prompt:
+    st.session_state.chat_history.append({"role": "user", "content": user_prompt})
+    with st.chat_message("user"):
+        st.write(user_prompt)
 
-        with st.chat_message("assistant"):
-            with st.spinner("Pensando..."):
-                respuesta, _ = respuesta_gemini(user_prompt)
-            st.write(respuesta)
+    with st.chat_message("assistant"):
+        with st.spinner("Pensando..."):
+            respuesta, _ = respuesta_ia(user_prompt)   # <- nombre correcto
+        st.write(respuesta)
 
-        st.session_state.chat_history.append({"role": "assistant", "content": respuesta})
-
+    st.session_state.chat_history.append({"role": "assistant", "content": respuesta})
     col_limpiar, _ = st.columns([1, 3])
     with col_limpiar:
         if st.button("Reiniciar conversación", use_container_width=True):
