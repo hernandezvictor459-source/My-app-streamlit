@@ -523,7 +523,7 @@ with tab2:
 
         with st.chat_message("assistant"):
             with st.spinner("Pensando..."):
-                respuesta, _ = respuesta_gemini(user_prompt)
+                respuesta, _ = respuesta_ia(user_prompt)
             st.write(respuesta)
 
         st.session_state.chat_history.append({"role": "assistant", "content": respuesta})
