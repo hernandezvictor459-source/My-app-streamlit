@@ -246,7 +246,7 @@ def obtener_clave_gemini():
 
 def clave_gemini():
     """Alias para compatibilidad con llamadas anteriores."""
-    return obtener_clave_gemini()
+    return obtener_clave_gemini(st.secrets.get)
 
 
 def validar_clave_gemini(clave):
