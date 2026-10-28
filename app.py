@@ -12,14 +12,6 @@ st.set_page_config(
     layout="wide"
 )
 
-from google import genai
-
-client = genai.Client(api_key="TU_KEY_AQUI")
-resp = client.models.generate_content(
-    model="gemini-2.5-flash",
-    contents="Hola"
-)
-print(resp.text)
 
 # --- ESTILO VISUAL (tema claro con acento rojo en IA, compacto y ejecutivo) ---
 st.markdown(
