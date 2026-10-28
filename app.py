@@ -226,8 +226,8 @@ st.subheader("Asistente Comercial Inteligente y Cotizador Mayorista")
 
 def obtener_clave_gemini():
     """Obtiene la API Key de Gemini priorizando la entrada del usuario, luego env vars y secrets."""
-    clave = st.session_state.get("gemini_api_key", "").strip()
-    if not clave:
+    clave_gemini = st.session_state.get("gemini_api_key", "").strip()
+    if not clave_gemini:
         clave = os.environ.get("GEMINI_API_KEY", "").strip()
     if not clave_gemini:
         try:
@@ -523,7 +523,7 @@ with tab2:
 
         with st.chat_message("assistant"):
             with st.spinner("Pensando..."):
-                respuesta, _ = respuesta_ia(user_prompt)
+                respuesta, _ = respuesta_gemini(user_prompt)
             st.write(respuesta)
 
         st.session_state.chat_history.append({"role": "assistant", "content": respuesta})
