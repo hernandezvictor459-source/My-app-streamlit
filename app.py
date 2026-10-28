@@ -244,7 +244,7 @@ def clave_gemini():
 
 def validar_clave_gemini(clave):
     """Valida formato básico de la clave antes de intentar usarla."""
-    if not clave:
+    if not clave_gemini:
         return False, "No hay una Gemini API Key disponible."
     if len(clave) < 10:
         return False, "La Gemini API Key parece incompleta o inválida."
