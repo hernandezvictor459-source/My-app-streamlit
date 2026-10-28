@@ -12,14 +12,14 @@ st.set_page_config(
     layout="wide"
 )
 
-api_key = st.secrets.get("GEMINI_API_KEY") or os.getenv("GEMINI_API_KEY")
+from google import genai
 
-if api_key:
-    genai.configure(api_key=api_key)
-    modelo_gemini = genai.GenerativeModel("gemini-3.8-flash")
-else:
-    modelo_gemini = None
-
+client = genai.Client(api_key="TU_KEY_AQUI")
+resp = client.models.generate_content(
+    model="gemini-2.5-flash",
+    contents="Hola"
+)
+print(resp.text)
 # --- ESTILO VISUAL (tema claro con acento rojo en IA, compacto y ejecutivo) ---
 st.markdown(
     """
