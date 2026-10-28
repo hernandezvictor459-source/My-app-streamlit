@@ -229,12 +229,12 @@ def obtener_clave_gemini():
     clave = st.session_state.get("gemini_api_key", "").strip()
     if not clave:
         clave = os.environ.get("GEMINI_API_KEY", "").strip()
-    if not clave:
+    if not clave_gemini:
         try:
-            clave = st.secrets["gemini"]["GEMINI_API_KEY"].strip()
+            clave_gemini = st.secrets["gemini"]["GEMINI_API_KEY"].strip()
         except Exception:
-            clave = ""
-    return clave
+            clave_gemini = "None"
+    return clave_gemini
 
 
 def clave_gemini():
