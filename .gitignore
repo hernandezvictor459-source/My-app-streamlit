@@ -1,3 +1,4 @@
 .streamlit/secrets.toml
 [gemini]
 GEMINI_API_KEY = "AQ.Ab8RN6IQGQjYixXy88MB9zgKa6SF3uCswItzSKM8TpIifHHqPg"
+GEMINI_API_KEY = "AQ.Ab8RN6L-N3y1BY_dlDZpl9T9q1K2fQt6W-ij52G4wiiC9H_dWQ"
