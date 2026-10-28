@@ -223,19 +223,6 @@ st.markdown(
 st.title("🥟 Masas Delicias del Caribe, S.R.L.")
 st.subheader("Asistente Comercial Inteligente y Cotizador Mayorista")
 
-# Sidebar con la clave API de Gemini
-with st.sidebar:
-    st.markdown("### Credenciales Gemini")
-    clave_ingresada = st.text_input(
-        "API Key de Gemini",
-        type="password",
-        value=st.session_state.get("gemini_api_key", ""),
-        help="Ingresá la clave de Google AI Studio / Gemini.",
-        key="google_api_key",
-    )
-    if clave_ingresada:
-        st.session_state["gemini_api_key"] = clave_ingresada.strip()
-
 # Panel ejecutivo compactado con KPI chips
 st.markdown(
     """
@@ -264,7 +251,6 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
-
 
 def obtener_clave_gemini():
     """Obtiene la API Key de Gemini priorizando la entrada del usuario, luego env vars y secrets."""
