@@ -260,32 +260,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-def obtener_clave_gemini():
-    """Obtiene la API Key de Gemini priorizando la entrada del usuario, luego env vars y secrets."""
-    clave = st.session_state.get("gemini_api_key", "").strip()
-    if not clave:
-        clave = os.environ.get("GEMINI_API_KEY", "").strip()
-    if not clave:
-        try:
-            clave = st.secrets["gemini"]["GEMINI_API_KEY"].strip()
-        except Exception:
-            clave = ""
-    return clave
-
-
-def clave_gemini():
-    """Alias para compatibilidad con llamadas anteriores."""
-    return obtener_clave_gemini()
-
-
-def validar_clave_gemini(clave):
-    """Valida formato básico de la clave antes de intentar usarla."""
-    if not clave:
-        return False, "No hay una Gemini API Key disponible."
-    if len(clave) < 10:
-        return False, "La Gemini API Key parece incompleta o inválida."
-    return True, ""
-
 
 def construir_prompt_usuario(user_prompt):
     return f"""
