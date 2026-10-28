@@ -20,6 +20,7 @@ resp = client.models.generate_content(
     contents="Hola"
 )
 print(resp.text)
+
 # --- ESTILO VISUAL (tema claro con acento rojo en IA, compacto y ejecutivo) ---
 st.markdown(
     """
