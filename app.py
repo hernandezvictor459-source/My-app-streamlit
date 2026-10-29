@@ -1,15 +1,19 @@
-import streamlit as st
-import pandas as pd
 import os
+import pandas as pd
+import streamlit as st
 
-
+try:
+    import google.generativeai as genai
+except ImportError:
+    genai = None
 
 # Configuración de página
 st.set_page_config(
     page_title="Asistente Comercial - Masas Delicias del Caribe",
     page_icon="🥟",
-    layout="wide"
+    layout="wide",
 )
+
 
 # --- LÓGICA DE NEGOCIO (PRECIOS Y COTIZADOR) ---
 def obtener_precio_base(cantidad):
@@ -27,6 +31,7 @@ def obtener_precio_base(cantidad):
         return 120.0
     return 0.0
 
+
 def calcular_cotizacion(cantidad, forma_pago):
     precio_unitario = obtener_precio_base(cantidad)
     subtotal = cantidad * precio_unitario
@@ -43,14 +48,66 @@ def calcular_cotizacion(cantidad, forma_pago):
 
     return precio_unitario, subtotal, descuento_monto, total, ahorro_total
 
-    st.markdown("---")
-    st.subheader("🔑 API Key de Gemini")
-    # Intentar obtener la API Key de los secretos o variable de entorno
-    api_key_input = st.text_input(
-        "Introduce tu GOOGLE_API_KEY si no está configurada:",
-        value=os.environ.get("GOOGLE_API_KEY", ""),
-        type="password"
-    )
+
+def crear_prompt(user_prompt):
+    return f"""
+Eres el Asistente Comercial Virtual de la empresa 'Masas Delicias del Caribe, S.R.L.'.
+Respondes en español claro y profesional.
+
+REGLAS IMPORTANTES:
+1. NO inventes precios. Utiliza estrictamente la siguiente tabla de precios de referencia:
+   - 1 a 49 paquetes: RD$ 120 por paquete
+   - 50 a 99 paquetes: RD$ 112 por paquete
+   - 100 a 249 paquetes: RD$ 105 por paquete
+   - 250 a 499 paquetes: RD$ 98 por paquete
+   - 500 a 999 paquetes: RD$ 92 por paquete
+   - 1,000 o más paquetes: RD$ 85 por paquete
+2. Descuentos por forma de pago (adicionales):
+   - Al contado: 3% adicional.
+   - A crédito aprobado: 1% adicional.
+3. Si el usuario te pregunta sobre la aprobación de créditos, aclara amablemente que tú, como IA, no apruebas créditos ni confirmas pagos directos, y que deben comunicarse con el departamento administrativo.
+4. Si te piden redactar un mensaje de cobro o recordatorio de pago atrasado, hazlo de forma sumamente cordial, respetuosa y profesional.
+
+Consulta del usuario: {user_prompt}
+"""
+
+
+def obtener_respuesta_ia(user_prompt):
+    if genai is None:
+        return "La librería de Gemini no está instalada. Instala 'google-generativeai' para habilitar esta función."
+
+    api_key_input = st.sidebar.text_input("Introduce tu Gemini API Key", type="password")
+    final_key = api_key_input if api_key_input else os.environ.get("GOOGLE_API_KEY", "")
+
+    if not final_key:
+        try:
+            final_key = st.secrets["GEMINI_API_KEY"]
+        except Exception:
+            final_key = ""
+
+    if not final_key:
+        return "No se encontró una API key de Gemini. Añádela en Streamlit Secrets o en la variable de entorno GOOGLE_API_KEY."
+
+    try:
+        client = genai.Client(api_key=final_key)
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=crear_prompt(user_prompt),
+        )
+        return response.text
+    except Exception as e:
+        return f"Ocurrió un error al consultar Gemini: {e}"
+
+
+# API Key de Gemini
+st.markdown("---")
+st.subheader("🔑 API Key de Gemini")
+api_key_input = st.text_input(
+    "Introduce tu GOOGLE_API_KEY si no está configurada:",
+    value=os.environ.get("GOOGLE_API_KEY", ""),
+    type="password",
+)
+
 
 tab1, tab2, tab3 = st.tabs(["📊 Cotizador Mayorista", "🤖 Asistente Virtual con IA", "📜 Lista de Precios y Políticas"])
 
@@ -65,18 +122,18 @@ with tab1:
             min_value=1,
             max_value=100000,
             value=100,
-            step=50
+            step=50,
         )
 
         forma_pago = st.selectbox(
             "Forma de pago:",
-            ["Ninguno / Regular", "Al contado (3%)", "Crédito aprobado (1%)"]
+            ["Ninguno / Regular", "Al contado (3%)", "Crédito aprobado (1%)"],
         )
 
     with col2:
         precio_unit, sub, desc, total, ahorro = calcular_cotizacion(cantidad, forma_pago)
 
-        st.markdown(f"### Resumen de la Cotización")
+        st.markdown("### Resumen de la Cotización")
         st.metric(label="Total a Pagar", value=f"RD$ {total:,.2f}")
         st.write(f"**Precio por paquete:** {precio_unit:,.2f}")
         st.write(f"**Subtotal inicial:** {sub:,.2f}")
@@ -94,53 +151,15 @@ with tab2:
         *Ejemplo: '¿Cuánto me costarían 500 paquetes pagando al contado?' o 'Redacta un recordatorio amable para un cliente con balance atrasado'.*"""
     )
 
-    user_prompt = st.text_area("¿En qué puedo ayudarte hoy?", height=100, placeholder="Escribe tu consulta aquí...")
-
-    
-# 1. Primero creas/defines la variable (por ejemplo, desde la barra lateral)
-api_key_input = st.sidebar.text_input("Introduce tu Gemini API Key", type="password")
-
-# 2. Después ya puedes usarla de forma segura
-final_key = api_key_input if api_key_input else os.environ.get("GOOGLE_API_KEY", "")
-
-client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
-MODELO = "gemini-3.8-flash"
-
-
-contexto_prompt = """
-Eres el Asistente Comercial Virtual de la empresa 'Masas Delicias del Caribe, S.R.L.'.
-Aquí va el resto de tu prompt sin espacios de más al inicio de cada línea, Respondes en español claro y profesional.            
-   
-    REGLAS IMPORTANTES:
-                    1. NO inventes precios. Utiliza estrictamente la siguiente tabla de precios de referencia:
-                       - 1 a 49 paquetes: RD$ 120 por paquete
-                       - 50 a 99 paquetes: RD$ 112 por paquete
-                       - 100 a 249 paquetes: RD$ 105 por paquete
-                       - 250 a 499 paquetes: RD$ 98 por paquete
-                       - 500 a 999 paquetes: RD$ 92 por paquete
-                       - 1,000 o más paquetes: RD$ 85 por paquete
-                    2. Descuentos por forma de pago (adicionales):
-                       - Al contado: 3% adicional.
-                       - A crédito aprobado: 1% adicional.
-                    3. Si el usuario te pregunta sobre la aprobación de créditos, aclara amablemente que tú, como IA, no apruebas créditos ni confirmas pagos directos, y que deben comunicarse con el personal autorizado.
-                    4. Si te piden redactar un mensaje de cobro o recordatorio de pago atrasado, hazlo de forma sumamente cordial, respetuosa y profesional.
-
-                    Consulta del usuario: {user_prompt}
-                    """                
-
-                    def respuesta_ia(user_prompt):
-    contexto_prompt = f"""
-    REGLAS IMPORTANTES:
-    - Responde de forma clara.
-    - Utiliza el contexto proporcionado.
-    """
-
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=contexto_prompt
+    user_prompt = st.text_area(
+        "¿En qué puedo ayudarte hoy?",
+        height=100,
+        placeholder="Escribe tu consulta aquí...",
     )
 
-    return response.text
+    if st.button("Consultar IA") and user_prompt:
+        respuesta = obtener_respuesta_ia(user_prompt)
+        st.write(respuesta)
 
 # TAB 3: LISTA DE PRECIOS Y POLÍTICAS
 with tab3:
@@ -149,18 +168,24 @@ with tab3:
     col_t1, col_t2 = st.columns(2)
     with col_t1:
         st.subheader("Precios por Volumen")
-        df_precios = pd.DataFrame({
-            "Rango de Paquetes": ["1-49", "50-99", "100-249", "250-499", "500-999", "1,000+"],
-            "Precio por Unidad (RD$)": [120.00, 112.00, 105.00, 98.00, 92.00, 85.00]
-        })
+        df_precios = pd.DataFrame(
+            {
+                "Rango de Paquetes": ["1-49", "50-99", "100-249", "250-499", "500-999", "1,000+"],
+                "Precio por Unidad (RD$)": [120.00, 112.00, 105.00, 98.00, 92.00, 85.00],
+            }
+        )
         st.table(df_precios)
 
     with col_t2:
         st.subheader("Descuentos Adicionales")
-        st.markdown("""- **Al Contado:** 3% de descuento adicional.
+        st.markdown(
+            """- **Al Contado:** 3% de descuento adicional.
 - **Crédito Aprobado:** 1% de descuento adicional.
-- *Ambos descuentos se aplican sobre el precio correspondiente a la escala de volumen.*""")
+- *Ambos descuentos se aplican sobre el precio correspondiente a la escala de volumen.*"""
+        )
 
-    st.info("""**Políticas Generales:**
+    st.info(
+        """**Políticas Generales:**
 - El precio de la cotización final se determina según la escala alcanzada por el total del pedido.
-- Los créditos son autorizados única y exclusivamente por el departamento administrativo de la empresa.""")
+- Los créditos son autorizados única y exclusivamente por el departamento administrativo de la empresa."""
+    )
