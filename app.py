@@ -15,6 +15,11 @@ st.set_page_config(
 )
 
 
+# Título principal del encabezado
+st.title("🥟 Masas Delicias del Caribe, S.R.L.")
+st.subheader("Asistente Comercial Inteligente y Cotizador Mayorista")
+
+
 # --- LÓGICA DE NEGOCIO (PRECIOS Y COTIZADOR) ---
 def obtener_precio_base(cantidad):
     if cantidad >= 1000:
