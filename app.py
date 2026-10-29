@@ -95,15 +95,11 @@ with tab2:
     user_prompt = st.text_area("¿En qué puedo ayudarte hoy?", height=100, placeholder="Escribe tu consulta aquí...")
 
     
-def respuesta_ia(user_prompt):
-    contexto_prompt = f"""
-    Pregunta del usuario: {user_prompt}
-    """
-    
-    api_key_input
-    or os.environ.get("GOOGLE_API_KEY", "")
-    or st.secrets.get("GOOGLE_API_KEY", "")
-)
+# 1. Primero creas/defines la variable (por ejemplo, desde la barra lateral)
+api_key_input = st.sidebar.text_input("Introduce tu Gemini API Key", type="password")
+
+# 2. Después ya puedes usarla de forma segura
+final_key = api_key_input if api_key_input else os.environ.get("GOOGLE_API_KEY", "")
 
                     contexto_prompt = f"""
                     Eres el Asistente Comercial Virtual de la empresa 'Masas Delicias del Caribe, S.R.L.'.
