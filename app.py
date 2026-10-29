@@ -224,30 +224,17 @@ st.markdown(
 st.title("🥟 Masas Delicias del Caribe, S.R.L.")
 st.subheader("Asistente Comercial Inteligente y Cotizador Mayorista")
 
-# Sidebar: entrada manual de la clave Gemini para facilitar configuración
-with st.sidebar:
-    st.header("Configuración")
-    api_key_input = st.text_input(
-        "Gemini API Key",
-        type="password",
-        value=st.session_state.get("gemini_api_key", ""),
-        help="Ingresa la clave de Gemini si no está disponible como variable de entorno o secret.",
-    )
-    if api_key_input:
-        st.session_state["gemini_api_key"] = api_key_input.strip()
-
-
 def obtener_clave_gemini():
     """Obtiene la API Key de Gemini priorizando la entrada del usuario, luego env vars y secrets."""
-    clave = st.session_state.get("gemini_api_key", "").strip()
-    if not clave:
+    clave_gemini = st.session_state.get("gemini_api_key", "").strip()
+    if not clave_gemini:
         clave = os.environ.get("GEMINI_API_KEY", "").strip()
-    if not clave:
+    if not clave_gemini:
         try:
-            clave = st.secrets["gemini"]["GEMINI_API_KEY"].strip()
+            clave_gemini = st.secrets["gemini"]["GEMINI_API_KEY"].strip()
         except Exception:
-            clave = ""
-    return clave
+            clave_gemini = "None"
+    return clave_gemini
 
 
 def clave_gemini():
@@ -257,10 +244,9 @@ def clave_gemini():
 
 def validar_clave_gemini(clave):
     """Valida formato básico de la clave antes de intentar usarla."""
-    clave_limpia = str(clave or "").strip()
-    if not clave_limpia:
+    if not clave_gemini:
         return False, "No hay una Gemini API Key disponible."
-    if len(clave_limpia) < 10:
+    if len(clave) < 10:
         return False, "La Gemini API Key parece incompleta o inválida."
     return True, ""
 
@@ -310,7 +296,7 @@ def construir_prompt_usuario(user_prompt):
     2. Descuentos por forma de pago (adicionales):
        - Al contado: 3% adicional.
        - A crédito aprobado: 1% adicional.
-    3. Si el usuario te pregunta sobre aprobación de créditos, aclara amablemente que tú, como IA, no apruebas créditos ni confirmas pagos directos, y que deben comunicarse con el departamento administrativo.
+    3. Si el usuario te pregunta sobre aprobación de créditos, aclara amablemente que tú, como IA, no apruebas créditos ni confirmas pagos directos, y que deben comunicarse con el departamento administr[...]
     4. Si te piden redactar un mensaje de cobro o recordatorio de pago atrasado, hazlo de forma cordial, respetuosa y profesional.
     5. Si no tienes información suficiente para responder, dilo con honestidad y sugiere cómo obtenerla.
 
@@ -377,7 +363,7 @@ def obtener_respuesta_gemini(final_key, user_prompt):
     ]
 
     ultimo_error = None
-    client = genai.Client(api_key=str(final_key).strip())
+    client = genai.Client(api_key=final_key)
 
     for modelo in modelos_disponibles:
         try:
@@ -583,8 +569,3 @@ with tab3:
         """,
         unsafe_allow_html=True,
     )
-
-
-# Nota de configuración:
-# La clave Gemini puede configurarse en Streamlit sidebar, variable de entorno GEMINI_API_KEY
-# o secret .streamlit/secrets.toml bajo [gemini] GEMINI_API_KEY = "...".
