@@ -4,7 +4,6 @@ import pandas as pd
 import streamlit as st
 from google import genai
 
-import streamlit as st
 
 # Para las variables globales
 usuario = st.secrets["DB_username"]
