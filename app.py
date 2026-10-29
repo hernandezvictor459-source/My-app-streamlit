@@ -99,15 +99,6 @@ def obtener_respuesta_ia(user_prompt):
         return f"Ocurrió un error al consultar Gemini: {e}"
 
 
-# API Key de Gemini
-st.markdown("---")
-st.subheader("🔑 API Key de Gemini")
-api_key_input = st.text_input(
-    "Introduce tu GOOGLE_API_KEY si no está configurada:",
-    value=os.environ.get("GOOGLE_API_KEY", ""),
-    type="password",
-)
-
 
 tab1, tab2, tab3 = st.tabs(["📊 Cotizador Mayorista", "🤖 Asistente Virtual con IA", "📜 Lista de Precios y Políticas"])
 
