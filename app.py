@@ -94,15 +94,13 @@ with tab2:
 
     user_prompt = st.text_area("¿En qué puedo ayudarte hoy?", height=100, placeholder="Escribe tu consulta aquí...")
 
-    if st.button("Enviar Consulta"):
-        final_key = api_key_input if api_key_input else os.environ.get("GOOGLE_API_KEY", "")
+    api_key_input = api_key_input if "api_key_input" in locals() else ""
 
-        if not final_key:
-            st.error("⚠️ Por favor, introduce tu GOOGLE_API_KEY en la barra lateral para usar el asistente con IA.")
-        else:
-            with st.spinner("Procesando respuesta con Gemini..."):
-                try:
-                    client = genai.Client(api_key=final_key)
+final_key = (
+    api_key_input
+    or os.environ.get("GOOGLE_API_KEY", "")
+    or st.secrets.get("GOOGLE_API_KEY", "")
+)
 
                     contexto_prompt = f"""
                     Eres el Asistente Comercial Virtual de la empresa 'Masas Delicias del Caribe, S.R.L.'.
