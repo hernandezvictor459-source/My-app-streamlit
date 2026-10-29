@@ -196,7 +196,7 @@ st.markdown(
         }
 
         .block-container {
-            padding-top: 0.8rem;
+            padding-top: 2rem;
             padding-bottom: 2rem;
         }
 
