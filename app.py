@@ -381,7 +381,7 @@ def respuesta_ia(user_prompt):
     if not user_prompt or not str(user_prompt).strip():
         return "Escribe una consulta antes de enviar.", "error"
 
-    clave_actual = obtener_clave_gemini()
+    clave_actual = ost.secrets["GEMINI_API_KEY"]
     es_valida, mensaje = validar_clave_gemini(clave_actual)
 
     if not clave_actual:
