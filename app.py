@@ -499,8 +499,7 @@ with tab2:
         with st.chat_message("assistant"):
             with st.spinner("Pensando..."):
                 respuesta, _ = respuesta_ia(user_prompt)
-                <div class="panel-ia"><div class="assistant-title">🤖 Asisten 
-            st.write(respuesta)
+                st.write(respuesta)
 
         st.session_state.chat_history.append({"role": "assistant", "content": respuesta})
 
