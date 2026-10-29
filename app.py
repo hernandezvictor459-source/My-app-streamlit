@@ -185,3 +185,210 @@ with tab3:
 - El precio de la cotización final se determina según la escala alcanzada por el total del pedido.
 - Los créditos son autorizados única y exclusivamente por el departamento administrativo de la empresa."""
     )
+
+# --- ESTILO VISUAL (tema claro con acento rojo en IA, compacto y ejecutivo) ---
+st.markdown(
+    """
+    <style>
+        .stApp {
+            background: #f4f7f7;
+            color: #1d2323;
+        }
+
+        .block-container {
+            padding-top: 0.8rem;
+            padding-bottom: 2rem;
+        }
+
+        div[data-testid="stSidebar"] {
+            background: linear-gradient(180deg, #eef2f2 0%, #edf0f0 100%);
+            border-right: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .stTabs [role="tablist"] {
+            gap: 0.65rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stTabs [role="tab"] {
+            background: rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 10px 10px 0 0;
+            color: #1f2727;
+            padding: 0.55rem 1rem;
+            min-height: 0;
+        }
+
+        .stTabs [role="tab"][aria-selected="true"] {
+            background: linear-gradient(180deg, #a51c1c 0%, #731010 100%);
+            color: #ffffff;
+            border-color: rgba(0, 0, 0, 0.08);
+            box-shadow: 0 8px 18px rgba(100, 18, 18, 0.18);
+        }
+
+        h1 {
+            margin-bottom: 0.2rem;
+            font-size: 2.0rem;
+            color: #1d2323;
+        }
+
+        h2 {
+            font-size: 1.3rem;
+            margin-top: 0.2rem;
+            margin-bottom: 0.6rem;
+            color: #252c2c;
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            margin-top: 0.15rem;
+            margin-bottom: 0.35rem;
+            color: #1e2424;
+        }
+
+        .kpi-strip {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin: 0 0 0.9rem 0;
+        }
+
+        .kpi-chip {
+            flex: 1 1 180px;
+            min-width: 180px;
+            background: linear-gradient(180deg, #ffffff 0%, #f3f6f6 100%);
+            border: 1px solid rgba(0,0,0,0.07);
+            border-radius: 14px;
+            padding: 0.7rem 0.9rem;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.04);
+        }
+
+        .kpi-chip .label {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #556060;
+            margin-bottom: 0.15rem;
+        }
+
+        .kpi-chip .value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #171d1d;
+        }
+
+        .kpi-chip .trend {
+            margin-top: 0.25rem;
+            font-size: 0.72rem;
+            color: #8d1d1d;
+        }
+
+        .panel-light {
+            background: rgba(255, 255, 255, 0.98);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 16px;
+            padding: 1rem 1.05rem;
+            box-shadow: 0 10px 22px rgba(0, 0, 0, 0.04);
+            margin-bottom: 0.85rem;
+        }
+
+        .panel-ia {
+            background: linear-gradient(180deg, rgba(255, 242, 242, 0.9) 0%, rgba(255, 255, 255, 0.98) 100%);
+            border: 1px solid rgba(180, 29, 29, 0.25);
+            border-radius: 16px;
+            padding: 1rem 1.05rem;
+            box-shadow: 0 10px 24px rgba(130, 18, 18, 0.08);
+            margin-bottom: 0.85rem;
+        }
+
+        .panel-light h3, .panel-light h4, .panel-light h5,
+        .panel-ia h3, .panel-ia h4, .panel-ia h5 {
+            color: #1d2323;
+            margin-top: 0;
+        }
+
+        .assistant-title {
+            color: #8d1d1d;
+            letter-spacing: 0.02em;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.10rem;
+        }
+
+        .table-wrapper {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            padding: 0.4rem;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .stAlert {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            color: #1d2323;
+        }
+
+        .stMetricValue {
+            color: #1d2323;
+        }
+
+        .stDataFrame {
+            background: #ffffff !important;
+            border-radius: 12px;
+            color: #1d2323 !important;
+        }
+
+        .stDataFrame div[data-testid="stDataFrame"] {
+            background: #ffffff !important;
+        }
+
+        .stDataFrame table,
+        .stDataFrame table thead th,
+        .stDataFrame table tbody td,
+        .stDataFrame .dataframe,
+        .stDataFrame .dataframe thead tr th,
+        .stDataFrame .dataframe tbody tr td {
+            background: #ffffff !important;
+            color: #1d2323 !important;
+            border-color: rgba(0, 0, 0, 0.09) !important;
+        }
+
+        .stDataFrame table thead th {
+            background: #f5f7f7 !important;
+            color: #1d2323 !important;
+            font-weight: 700;
+        }
+
+        .stDataFrame table tbody tr:nth-child(even) td {
+            background: #fafbfb !important;
+        }
+
+        div[data-testid="stTextInputRootElement"],
+        div[data-testid="stTextAreaRootElement"] {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
+        }
+
+        div.stButton > button {
+            background: linear-gradient(180deg, #8f1b1b 0%, #4d0b0b 100%);
+            border: 1px solid #d95656;
+            color: #fff;
+            font-weight: 700;
+            border-radius: 12px;
+            box-shadow: 0 10px 22px rgba(120, 18, 18, 0.18);
+            min-height: 2.5rem;
+        }
+
+        div.stButton > button:hover {
+            background: linear-gradient(180deg, #a82222 0%, #621010 100%);
+            border-color: #f0a0a0;
+        }
+
+        input, textarea, select {
+            color: #1d2323 !important;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
