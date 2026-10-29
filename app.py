@@ -109,10 +109,9 @@ MODELO = "gemini-3.8-flash"
 
 contexto_prompt = """
 Eres el Asistente Comercial Virtual de la empresa 'Masas Delicias del Caribe, S.R.L.'.
-Aquí va el resto de tu prompt sin espacios de más al inicio de cada línea, Respondes en español claro y profesional.
-"""                 
-
-                    ""REGLAS IMPORTANTES:
+Aquí va el resto de tu prompt sin espacios de más al inicio de cada línea, Respondes en español claro y profesional.            
+   
+    REGLAS IMPORTANTES:
                     1. NO inventes precios. Utiliza estrictamente la siguiente tabla de precios de referencia:
                        - 1 a 49 paquetes: RD$ 120 por paquete
                        - 50 a 99 paquetes: RD$ 112 por paquete
@@ -127,7 +126,7 @@ Aquí va el resto de tu prompt sin espacios de más al inicio de cada línea, Re
                     4. Si te piden redactar un mensaje de cobro o recordatorio de pago atrasado, hazlo de forma sumamente cordial, respetuosa y profesional.
 
                     Consulta del usuario: {user_prompt}
-                    """
+                    """                
 
                     response = client.models.generate_content(
                         model='gemini-2.5-flash-lite',
