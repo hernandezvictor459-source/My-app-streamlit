@@ -224,17 +224,30 @@ st.markdown(
 st.title("🥟 Masas Delicias del Caribe, S.R.L.")
 st.subheader("Asistente Comercial Inteligente y Cotizador Mayorista")
 
+# Sidebar: entrada manual de la clave Gemini para facilitar configuración
+with st.sidebar:
+    st.header("Configuración")
+    api_key_input = st.text_input(
+        "Gemini API Key",
+        type="password",
+        value=st.session_state.get("gemini_api_key", ""),
+        help="Ingresa la clave de Gemini si no está disponible como variable de entorno o secret.",
+    )
+    if api_key_input:
+        st.session_state["gemini_api_key"] = api_key_input.strip()
+
+
 def obtener_clave_gemini():
     """Obtiene la API Key de Gemini priorizando la entrada del usuario, luego env vars y secrets."""
-    clave_gemini = st.session_state.get("gemini_api_key", "").strip()
-    if not clave_gemini:
+    clave = st.session_state.get("gemini_api_key", "").strip()
+    if not clave:
         clave = os.environ.get("GEMINI_API_KEY", "").strip()
-    if not clave_gemini:
+    if not clave:
         try:
-            clave_gemini = st.secrets["gemini"]["GEMINI_API_KEY"].strip()
+            clave = st.secrets["gemini"]["GEMINI_API_KEY"].strip()
         except Exception:
-            clave_gemini = "None"
-    return clave_gemini
+            clave = ""
+    return clave
 
 
 def clave_gemini():
@@ -244,9 +257,10 @@ def clave_gemini():
 
 def validar_clave_gemini(clave):
     """Valida formato básico de la clave antes de intentar usarla."""
-    if not clave_gemini:
+    clave_limpia = str(clave or "").strip()
+    if not clave_limpia:
         return False, "No hay una Gemini API Key disponible."
-    if len(clave) < 10:
+    if len(clave_limpia) < 10:
         return False, "La Gemini API Key parece incompleta o inválida."
     return True, ""
 
@@ -363,7 +377,7 @@ def obtener_respuesta_gemini(final_key, user_prompt):
     ]
 
     ultimo_error = None
-    client = genai.Client(api_key=final_key)
+    client = genai.Client(api_key=str(final_key).strip())
 
     for modelo in modelos_disponibles:
         try:
@@ -569,3 +583,8 @@ with tab3:
         """,
         unsafe_allow_html=True,
     )
+
+
+# Nota de configuración:
+# La clave Gemini puede configurarse en Streamlit sidebar, variable de entorno GEMINI_API_KEY
+# o secret .streamlit/secrets.toml bajo [gemini] GEMINI_API_KEY = "...".
