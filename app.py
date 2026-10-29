@@ -196,8 +196,8 @@ st.markdown(
         }
 
         .block-container {
-            padding-top: 2rem;
-            padding-bottom: 2rem;
+            padding-top: 4rem;
+            padding-bottom: 1.8rem;
         }
 
         div[data-testid="stSidebar"] {
