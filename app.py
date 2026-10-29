@@ -224,31 +224,6 @@ st.markdown(
 st.title("🥟 Masas Delicias del Caribe, S.R.L.")
 st.subheader("Asistente Comercial Inteligente y Cotizador Mayorista")
 
-def obtener_clave_gemini():
-    """Obtiene la API Key de Gemini priorizando la entrada del usuario, luego env vars y secrets."""
-    clave_gemini = st.session_state.get("gemini_api_key", "").strip()
-    if not clave_gemini:
-        clave = os.environ.get("GEMINI_API_KEY", "").strip()
-    if not clave_gemini:
-        try:
-            clave_gemini = st.secrets["gemini"]["GEMINI_API_KEY"].strip()
-        except Exception:
-            clave_gemini = "None"
-    return clave_gemini
-
-
-def clave_gemini():
-    """Alias para compatibilidad con llamadas anteriores."""
-    return obtener_clave_gemini()
-
-
-def validar_clave_gemini(clave):
-    """Valida formato básico de la clave antes de intentar usarla."""
-    if not clave_gemini:
-        return False, "No hay una Gemini API Key disponible."
-    if len(clave) < 10:
-        return False, "La Gemini API Key parece incompleta o inválida."
-    return True, ""
 
 # Panel ejecutivo compactado con KPI chips
 st.markdown(
