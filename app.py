@@ -106,12 +106,13 @@ final_key = api_key_input if api_key_input else os.environ.get("GOOGLE_API_KEY",
 client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
 MODELO = "gemini-3.8-flash"
 
-contexto_prompt = f"""
-Este es el texto del contexto...
-"""
-                    Eres el Asistente Comercial Virtual de la empresa 'Masas Delicias del Caribe, S.R.L.'.
-                    Respondes en español claro y profesional.
 
+contexto_prompt = """
+Eres el Asistente Comercial Virtual de la empresa 'Masas Delicias del Caribe, S.R.L.'.
+Aquí va el resto de tu prompt sin espacios de más al inicio de cada línea, Respondes en español claro y profesional.
+"""                 
+
+                   
                     REGLAS IMPORTANTES:
                     1. NO inventes precios. Utiliza estrictamente la siguiente tabla de precios de referencia:
                        - 1 a 49 paquetes: RD$ 120 por paquete
