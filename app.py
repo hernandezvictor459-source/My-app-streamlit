@@ -103,7 +103,8 @@ api_key_input = st.sidebar.text_input("Introduce tu Gemini API Key", type="passw
 # 2. Después ya puedes usarla de forma segura
 final_key = api_key_input if api_key_input else os.environ.get("GOOGLE_API_KEY", "")
 
-                    MODELO = "gemini-3.8-flash"
+client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
+MODELO = "gemini-3.8-flash"
 
 contexto_prompt = f"""
 Este es el texto del contexto...
