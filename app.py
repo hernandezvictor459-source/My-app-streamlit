@@ -128,14 +128,19 @@ Aquí va el resto de tu prompt sin espacios de más al inicio de cada línea, Re
                     Consulta del usuario: {user_prompt}
                     """                
 
-                    response = client.models.generate_content(
-                        model='gemini-2.5-flash-lite',
-                        contents=contexto_prompt,
-                    )
-                    st.markdown("### Respuesta del Asistente:")
-                    st.write(response.text)
-                except Exception as e:
-                    st.error(f"Ocurrió un error al contactar con la API de Gemini: {e}")
+                    def respuesta_ia(user_prompt):
+    contexto_prompt = f"""
+    REGLAS IMPORTANTES:
+    - Responde de forma clara.
+    - Utiliza el contexto proporcionado.
+    """
+
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=contexto_prompt
+    )
+
+    return response.text
 
 # TAB 3: LISTA DE PRECIOS Y POLÍTICAS
 with tab3:
