@@ -399,7 +399,8 @@ def respuesta_ia(user_prompt):
         return str(e), "error"
     except Exception as e:
         return mostrar_error_api(e), "error"
-
+        
+st.secrets["GEMINI_API_KEY"]
 
 # --- LÓGICA DE NEGOCIO (PRECIOS Y COTIZADOR) ---
 def obtener_precio_base(cantidad):
