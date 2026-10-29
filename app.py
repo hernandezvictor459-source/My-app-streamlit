@@ -5,13 +5,6 @@ import streamlit as st
 from google import genai
 
 
-# Para las variables globales
-usuario = st.secrets["DB_username"]
-token = st.secrets["DB_TOKEN"]
-
-# Para las variables dentro de una sección
-mi_clave = st.secrets["some_section"]["some_key"]
-
 # Configuración de página
 st.set_page_config(
     page_title="Asistente Comercial - Masas Delicias del Caribe",
