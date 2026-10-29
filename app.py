@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import os
 
+
+
 # Configuración de página
 st.set_page_config(
     page_title="Asistente Comercial - Masas Delicias del Caribe",
@@ -101,7 +103,11 @@ api_key_input = st.sidebar.text_input("Introduce tu Gemini API Key", type="passw
 # 2. Después ya puedes usarla de forma segura
 final_key = api_key_input if api_key_input else os.environ.get("GOOGLE_API_KEY", "")
 
-                    contexto_prompt = f"""
+                    MODELO = "gemini-3.8-flash"
+
+contexto_prompt = f"""
+Este es el texto del contexto...
+"""
                     Eres el Asistente Comercial Virtual de la empresa 'Masas Delicias del Caribe, S.R.L.'.
                     Respondes en español claro y profesional.
 
