@@ -91,7 +91,7 @@ def obtener_respuesta_ia(user_prompt):
     try:
         client = genai.Client(api_key=final_key)
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-3.8-flash",
             contents=crear_prompt(user_prompt),
         )
         return response.text
