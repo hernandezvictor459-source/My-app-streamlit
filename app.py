@@ -96,7 +96,10 @@ with tab2:
 
     api_key_input = api_key_input if "api_key_input" in locals() else ""
 
-final_key = (
+def respuesta_ia(user_prompt):
+    contexto_prompt = f"""
+    Pregunta del usuario: {user_prompt}
+    """
     api_key_input
     or os.environ.get("GOOGLE_API_KEY", "")
     or st.secrets.get("GOOGLE_API_KEY", "")
