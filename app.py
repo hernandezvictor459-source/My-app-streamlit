@@ -14,6 +14,25 @@ st.set_page_config(
     layout="wide",
 )
 
+# --- ESTILO VISUAL (tema claro con acento rojo en IA, compacto y ejecutivo) ---
+st.markdown(
+    """
+    <style>
+        .stApp {
+            background: #f4f7f7;
+            color: #1d2323;
+        }
+
+        .block-container {
+            padding-top: 0.8rem;
+            padding-bottom: 2rem;
+        }
+
+        div[data-testid="stSidebar"] {
+            background: linear-gradient(180deg, #eef2f2 0%, #edf0f0 100%);
+            border-right: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
 
 # --- LÓGICA DE NEGOCIO (PRECIOS Y COTIZADOR) ---
 def obtener_precio_base(cantidad):
