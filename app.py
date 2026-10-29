@@ -94,12 +94,12 @@ with tab2:
 
     user_prompt = st.text_area("¿En qué puedo ayudarte hoy?", height=100, placeholder="Escribe tu consulta aquí...")
 
-    api_key_input = api_key_input if "api_key_input" in locals() else ""
-
+    
 def respuesta_ia(user_prompt):
     contexto_prompt = f"""
     Pregunta del usuario: {user_prompt}
     """
+    
     api_key_input
     or os.environ.get("GOOGLE_API_KEY", "")
     or st.secrets.get("GOOGLE_API_KEY", "")
