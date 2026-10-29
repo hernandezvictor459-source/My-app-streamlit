@@ -105,7 +105,9 @@ def obtener_respuesta_ia(user_prompt):
 
 
 
-tab1, tab2, tab3 = st.tabs(["📊 Cotizador Mayorista", "🤖 Asistente Virtual con IA", "📜 Lista de Precios y Políticas"])
+tab1, tab2, tab3 = st.tabs(["📊 Cotizador Mayorista", 
+                            "🤖 Asistente Virtual con IA", 
+                            "📜 Lista de Precios y Políticas"])
 
 # TAB 1: COTIZADOR
 with tab1:
