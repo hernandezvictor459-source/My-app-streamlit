@@ -1,12 +1,9 @@
 import os
 import pandas as pd
 import streamlit as st
-from google import genai
-
-
 
 try:
-    import google.generativeai as genai
+    from google import genai
 except ImportError:
     genai = None
 
@@ -77,7 +74,7 @@ Consulta del usuario: {user_prompt}
 
 def obtener_respuesta_ia(user_prompt):
     if genai is None:
-        return "La librería de Gemini no está instalada. Instala 'google-generativeai' para habilitar esta función."
+        return "La librería de Gemini no está instalada. Instala 'google-genai' para habilitar esta función."
 
     api_key_input = st.sidebar.text_input("Introduce tu Gemini API Key", type="password")
     final_key = api_key_input if api_key_input else os.environ.get("GOOGLE_API_KEY", "")
