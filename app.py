@@ -112,8 +112,7 @@ Eres el Asistente Comercial Virtual de la empresa 'Masas Delicias del Caribe, S.
 Aquí va el resto de tu prompt sin espacios de más al inicio de cada línea, Respondes en español claro y profesional.
 """                 
 
-                   
-                    REGLAS IMPORTANTES:
+                    ""REGLAS IMPORTANTES:
                     1. NO inventes precios. Utiliza estrictamente la siguiente tabla de precios de referencia:
                        - 1 a 49 paquetes: RD$ 120 por paquete
                        - 50 a 99 paquetes: RD$ 112 por paquete
