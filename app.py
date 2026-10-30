@@ -78,7 +78,30 @@ Consulta del usuario: {user_prompt}
 """
 
 
+def obtener_respuesta_ia(user_prompt):
+    if genai is None:
+        return "La librería de Gemini no está instalada. Instala 'google-genai' para habilitar esta función."
 
+
+
+    if not final_key:
+        try:
+            final_key = st.secrets["GEMINI_API_KEY"]
+        except Exception:
+            final_key = ""
+
+    if not final_key:
+        return "No se encontró una API key de Gemini. Añádela en Streamlit Secrets o en la variable de entorno GOOGLE_API_KEY."
+
+    try:
+        client = genai.Client(api_key=final_key)
+        response = client.models.generate_content(
+            model="gemini-3.8-flash",
+            contents=crear_prompt(user_prompt),
+        )
+        return response.text
+    except Exception as e:
+        return f"Ocurrió un error al consultar Gemini: {e}"
 
 
 
