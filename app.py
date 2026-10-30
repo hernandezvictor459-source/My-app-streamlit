@@ -160,19 +160,18 @@ with tab2:
         respuesta = obtener_respuesta_ia(user_prompt)
         st.write(respuesta)
 
-try:
-    with st.spinner("🥟 Espere un momento, DeliciaBot lo asiste..."):
+def obtener_respuesta_gemini(client, contexto_prompt):
+    try:
+        with st.spinner("🥟 Espere un momento, DeliciaBot lo asiste..."):
+            response = client.models.generate_content(
+                model="gemini-2.5-flash",  # Nota: asegúrate de usar un modelo válido como gemini-2.5-flash o gemini-1.5-flash
+                contents=contexto_prompt
+            )
+        return response.text, None
 
-        response = client.models.generate_content(
-            model="gemini-3.8-flash",
-            contents=contexto_prompt
-        )
-
-    return response.text, None
-
-except Exception as e:
-    st.error(f"Ocurrió un error al consultar Gemini: {e}")
-    return None, str(e)
+    except Exception as e:
+        st.error(f"Ocurrió un error al consultar Gemini: {e}")
+        return None, str(e)
 
 # TAB 3: LISTA DE PRECIOS Y POLÍTICAS
 with tab3:
