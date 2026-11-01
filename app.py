@@ -122,12 +122,15 @@ def obtener_respuesta_ia(user_prompt):
 
 # --- UI: SIDEBAR API KEY ---
 st.sidebar.header("Configuración")
-st.session_state["gemini_api_key"] = st.sidebar.text_input(
+
+gemini_api_key = st.sidebar.text_input(
     "Introduce tu Gemini API Key",
     type="password",
-    value=st.session_state.get("gemini_api_key", ""),
     key="gemini_api_key",
 )
+
+if gemini_api_key:
+    st.session_state["gemini_api_key"] = gemini_api_key
 
 # --- TABS ---
 tab1, tab2, tab3 = st.tabs(["📊 Cotizador Mayorista", "🤖 Asistente Virtual con IA", "📜 Lista de Precios y Políticas"])
