@@ -107,7 +107,7 @@ def obtener_respuesta_ia(user_prompt):
     try:
         with st.spinner("🥟 Consultando al asistente comercial..."):
             response = client.models.generate_content(
-                model="gemini-2.5-flash",
+                model="gemini-3.8-flash",
                 contents=crear_prompt(user_prompt),
             )
 
