@@ -43,10 +43,10 @@ def calcular_cotizacion(cantidad, forma_pago):
     subtotal = cantidad * precio_unitario
 
     descuento_porcentaje = 0.0
-    if forma_pago == "Al contado (3%)":
+    if forma_pago == "Al contado (5%)":
+        descuento_porcentaje = 0.05
+    elif forma_pago == "Crédito aprobado (3%)":
         descuento_porcentaje = 0.03
-    elif forma_pago == "Crédito aprobado (1%)":
-        descuento_porcentaje = 0.01
 
     descuento_monto = subtotal * descuento_porcentaje
     total = subtotal - descuento_monto
@@ -69,8 +69,8 @@ REGLAS IMPORTANTES:
    - 500 a 999 paquetes: RD$ 92 por paquete
    - 1,000 o más paquetes: RD$ 85 por paquete
 2. Descuentos por forma de pago (adicionales):
-   - Al contado: 3% adicional.
-   - A crédito aprobado: 1% adicional.
+   - Al contado: 5% adicional.
+   - A crédito aprobado: 3% adicional.
 3. Si el usuario te pregunta sobre la aprobación de créditos, aclara amablemente que tú, como IA, no apruebas créditos ni confirmas pagos directos, y que deben comunicarse con el departamento administrativo.
 4. Si te piden redactar un mensaje de cobro o recordatorio de pago atrasado, hazlo de forma sumamente cordial, respetuosa y profesional.
 
@@ -106,9 +106,7 @@ def obtener_respuesta_ia(user_prompt):
 
 
 
-tab1, tab2, tab3 = st.tabs(["📊 Cotizador Mayorista", 
-                            "🤖 Asistente Virtual con IA", 
-                            "📜 Lista de Precios y Políticas"])
+tab1, tab2, tab3 = st.tabs(["📊 Cotizador Mayorista",  "🤖 Asistente Virtual con IA",   "📜 Lista de Precios y Políticas"])
 
 # TAB 1: COTIZADOR
 with tab1:
@@ -126,7 +124,7 @@ with tab1:
 
         forma_pago = st.selectbox(
             "Forma de pago:",
-            ["Ninguno / Regular", "Al contado (3%)", "Crédito aprobado (1%)"],
+            ["Ninguno / Regular", "Al contado (5%)", "Crédito aprobado (3%)"],
         )
 
     with col2:
@@ -134,11 +132,11 @@ with tab1:
 
         st.markdown("### Resumen de la Cotización")
         st.metric(label="Total a Pagar", value=f"RD$ {total:,.2f}")
-        st.write(f"**Precio por paquete:** {precio_unit:,.2f}")
-        st.write(f"**Subtotal inicial:** {sub:,.2f}")
-        st.write(f"**Descuento aplicado:** {desc:,.2f}")
+        st.write(f"**Precio por Paquete:** {precio_unit:,.2f}")
+        st.write(f"**Subtotal Inicial:** {sub:,.2f}")
+        st.write(f"**Descuento Aplicado:** {desc:,.2f}")
         if ahorro > 0:
-            st.success(f"🎉 ¡Estás ahorrando RD$ {ahorro:,.2f} comparado con el precio base regular!")
+            st.success(f"🎉 ¡Te Estas Ahorrando RD$ {ahorro:,.2f} comparado con el precio base regular!")
 
         st.caption("Nota: Los precios son ficticios y no incluyen impuestos ni transporte.")
 
@@ -164,7 +162,7 @@ def obtener_respuesta_gemini(client, contexto_prompt):
     try:
         with st.spinner("🥟 Espere un momento, DeliciaBot lo asiste..."):
             response = client.models.generate_content(
-                model="gemini-2.5-flash",  # Nota: asegúrate de usar un modelo válido como gemini-2.5-flash o gemini-1.5-flash
+                model="gemini-3.8-flash",  # Nota: asegúrate de usar un modelo válido como gemini-3.8-flash o gemini-2.5-flash
                 contents=contexto_prompt
             )
         return response.text, None
@@ -191,8 +189,8 @@ with tab3:
     with col_t2:
         st.subheader("Descuentos Adicionales")
         st.markdown(
-            """- **Al Contado:** 3% de descuento adicional.
-- **Crédito Aprobado:** 1% de descuento adicional.
+            """- **Al Contado:** 5% de descuento adicional.
+- **Crédito Aprobado:** 3% de descuento adicional.
 - *Ambos descuentos se aplican sobre el precio correspondiente a la escala de volumen.*"""
         )
 
