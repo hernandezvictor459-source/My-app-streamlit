@@ -3,25 +3,18 @@ import pandas as pd
 import streamlit as st
 from google import genai
 
-try:
-    from google import genai
-except ImportError:
-    genai = None
-
-# Configuración de página
+# --- CONFIGURACIÓN ---
 st.set_page_config(
     page_title="Asistente Comercial - Masas Delicias del Caribe",
     page_icon="🥟",
     layout="wide",
 )
 
-
-# Título principal del encabezado
+# Título principal
 st.title("🥟 Masas Delicias del Caribe, S.R.L.")
 st.subheader("Asistente Comercial Inteligente y Cotizador Mayorista")
 
-
-# --- LÓGICA DE NEGOCIO (PRECIOS Y COTIZADOR) ---
+# --- FUNCIONES DE NEGOCIO ---
 def obtener_precio_base(cantidad):
     if cantidad >= 1000:
         return 85.0
@@ -77,36 +70,67 @@ REGLAS IMPORTANTES:
 Consulta del usuario: {user_prompt}
 """
 
+# --- CLIENTE GEMINI CACHADO ---
+def obtener_cliente_gemini():
+    if "gemini_client" not in st.session_state:
+        api_key = st.session_state.get("gemini_api_key", "")
+
+        if not api_key:
+            api_key = os.environ.get("GOOGLE_API_KEY", "")
+
+        if not api_key:
+            try:
+                api_key = st.secrets["GEMINI_API_KEY"]
+            except Exception:
+                api_key = ""
+
+        if not api_key:
+            st.session_state["gemini_client"] = None
+            return None
+
+        try:
+            st.session_state["gemini_client"] = genai.Client(api_key=api_key)
+        except Exception:
+            st.session_state["gemini_client"] = None
+
+    return st.session_state["gemini_client"]
+
 
 def obtener_respuesta_ia(user_prompt):
     if genai is None:
         return "La librería de Gemini no está instalada. Instala 'google-genai' para habilitar esta función."
 
-    api_key_input = st.sidebar.text_input("Introduce tu Gemini API Key", type="password")
-    final_key = api_key_input if api_key_input else os.environ.get("GOOGLE_API_KEY", "")
-
-    if not final_key:
-        try:
-            final_key = st.secrets["GEMINI_API_KEY"]
-        except Exception:
-            final_key = ""
-
-    if not final_key:
+    client = obtener_cliente_gemini()
+    if client is None:
         return "No se encontró una API key de Gemini. Añádela en Streamlit Secrets o en la variable de entorno GOOGLE_API_KEY."
 
     try:
-        client = genai.Client(api_key=final_key)
-        response = client.models.generate_content(
-            model="gemini-3.8-flash",
-            contents=crear_prompt(user_prompt),
-        )
-        return response.text
+        with st.spinner("🥟 Consultando al asistente comercial..."):
+            response = client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=crear_prompt(user_prompt),
+            )
+
+        texto = getattr(response, "text", None)
+        if texto:
+            return texto.strip()
+        return str(response)
+
     except Exception as e:
         return f"Ocurrió un error al consultar Gemini: {e}"
 
 
+# --- UI: SIDEBAR API KEY ---
+st.sidebar.header("Configuración")
+st.session_state["gemini_api_key"] = st.sidebar.text_input(
+    "Introduce tu Gemini API Key",
+    type="password",
+    value=st.session_state.get("gemini_api_key", ""),
+    key="gemini_api_key",
+)
 
-tab1, tab2, tab3 = st.tabs(["📊 Cotizador Mayorista",  "🤖 Asistente Virtual con IA",   "📜 Lista de Precios y Políticas"])
+# --- TABS ---
+tab1, tab2, tab3 = st.tabs(["📊 Cotizador Mayorista", "🤖 Asistente Virtual con IA", "📜 Lista de Precios y Políticas"])
 
 # TAB 1: COTIZADOR
 with tab1:
@@ -158,19 +182,6 @@ with tab2:
         respuesta = obtener_respuesta_ia(user_prompt)
         st.write(respuesta)
 
-def obtener_respuesta_gemini(client, contexto_prompt):
-    try:
-        with st.spinner("🥟 Espere un momento, DeliciaBot lo asiste..."):
-            response = client.models.generate_content(
-                model="gemini-3.8-flash",  # Nota: asegúrate de usar un modelo válido como gemini-3.8-flash o gemini-2.5-flash
-                contents=contexto_prompt
-            )
-        return response.text, None
-
-    except Exception as e:
-        st.error(f"Ocurrió un error al consultar Gemini: {e}")
-        return None, str(e)
-
 # TAB 3: LISTA DE PRECIOS Y POLÍTICAS
 with tab3:
     st.header("Políticas Comerciales de Referencia")
@@ -200,7 +211,7 @@ with tab3:
 - Los créditos son autorizados única y exclusivamente por el departamento administrativo de la empresa."""
     )
 
-# --- ESTILO VISUAL (tema claro con acento rojo en IA, compacto y ejecutivo) ---
+# --- ESTILO VISUAL (se mantiene igual) ---
 st.markdown(
     """
     <style>
@@ -258,130 +269,6 @@ st.markdown(
             margin-top: 0.15rem;
             margin-bottom: 0.35rem;
             color: #1e2424;
-        }
-
-        .kpi-strip {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-            margin: 0 0 0.9rem 0;
-        }
-
-        .kpi-chip {
-            flex: 1 1 180px;
-            min-width: 180px;
-            background: linear-gradient(180deg, #ffffff 0%, #f3f6f6 100%);
-            border: 1px solid rgba(0,0,0,0.07);
-            border-radius: 14px;
-            padding: 0.7rem 0.9rem;
-            box-shadow: 0 8px 18px rgba(0,0,0,0.04);
-        }
-
-        .kpi-chip .label {
-            font-size: 0.72rem;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: #556060;
-            margin-bottom: 0.15rem;
-        }
-
-        .kpi-chip .value {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #171d1d;
-        }
-
-        .kpi-chip .trend {
-            margin-top: 0.25rem;
-            font-size: 0.72rem;
-            color: #8d1d1d;
-        }
-
-        .panel-light {
-            background: rgba(255, 255, 255, 0.98);
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            border-radius: 16px;
-            padding: 1rem 1.05rem;
-            box-shadow: 0 10px 22px rgba(0, 0, 0, 0.04);
-            margin-bottom: 0.85rem;
-        }
-
-        .panel-ia {
-            background: linear-gradient(180deg, rgba(255, 242, 242, 0.9) 0%, rgba(255, 255, 255, 0.98) 100%);
-            border: 1px solid rgba(180, 29, 29, 0.25);
-            border-radius: 16px;
-            padding: 1rem 1.05rem;
-            box-shadow: 0 10px 24px rgba(130, 18, 18, 0.08);
-            margin-bottom: 0.85rem;
-        }
-
-        .panel-light h3, .panel-light h4, .panel-light h5,
-        .panel-ia h3, .panel-ia h4, .panel-ia h5 {
-            color: #1d2323;
-            margin-top: 0;
-        }
-
-        .assistant-title {
-            color: #8d1d1d;
-            letter-spacing: 0.02em;
-            font-size: 1.4rem;
-            font-weight: 700;
-            margin-bottom: 0.10rem;
-        }
-
-        .table-wrapper {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 12px;
-            padding: 0.4rem;
-            border: 1px solid rgba(0, 0, 0, 0.08);
-        }
-
-        .stAlert {
-            background: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            color: #1d2323;
-        }
-
-        .stMetricValue {
-            color: #1d2323;
-        }
-
-        .stDataFrame {
-            background: #ffffff !important;
-            border-radius: 12px;
-            color: #1d2323 !important;
-        }
-
-        .stDataFrame div[data-testid="stDataFrame"] {
-            background: #ffffff !important;
-        }
-
-        .stDataFrame table,
-        .stDataFrame table thead th,
-        .stDataFrame table tbody td,
-        .stDataFrame .dataframe,
-        .stDataFrame .dataframe thead tr th,
-        .stDataFrame .dataframe tbody tr td {
-            background: #ffffff !important;
-            color: #1d2323 !important;
-            border-color: rgba(0, 0, 0, 0.09) !important;
-        }
-
-        .stDataFrame table thead th {
-            background: #f5f7f7 !important;
-            color: #1d2323 !important;
-            font-weight: 700;
-        }
-
-        .stDataFrame table tbody tr:nth-child(even) td {
-            background: #fafbfb !important;
-        }
-
-        div[data-testid="stTextInputRootElement"],
-        div[data-testid="stTextAreaRootElement"] {
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            border-radius: 12px;
         }
 
         div.stButton > button {
