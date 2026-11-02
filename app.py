@@ -74,16 +74,16 @@ Consulta del usuario: {user_prompt}
 def obtener_cliente_gemini():
     
 
-        if not api_key:
+    if not api_key:
             api_key = os.environ.get("GOOGLE_API_KEY", "")
 
-        if not api_key:
+    if not api_key:
             try:
                 api_key = st.secrets["GEMINI_API_KEY"]
             except Exception:
                 api_key = ""
 
-        if not api_key:
+     if not api_key:
             st.session_state["gemini_client"] = None
             return None
 
