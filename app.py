@@ -83,7 +83,7 @@ def obtener_cliente_gemini():
             except Exception:
                 api_key = ""
 
- if not api_key:
+    if not api_key:
             st.session_state["gemini_client"] = None
             return None
 
