@@ -72,25 +72,27 @@ Consulta del usuario: {user_prompt}
 
 # --- CLIENTE GEMINI CACHADO ---
 def obtener_cliente_gemini():
-    api_key = st.session_state.get("gemini_api_key", "")
+    if "gemini_client" not in st.session_state:
+        api_key = st.session_state.get("gemini_api_key", "")
+    
 
-    if not api_key:
-        api_key = os.environ.get("GOOGLE_API_KEY", "")
+        if not api_key:
+            api_key = os.environ.get("GOOGLE_API_KEY", "")
 
-    if not api_key:
+        if not api_key:
+            try:
+                api_key = st.secrets["GEMINI_API_KEY"]
+            except Exception:
+                api_key = ""
+
+        if not api_key:
+            st.session_state["gemini_client"] = None
+            return None
+
         try:
-            api_key = st.secrets["GEMINI_API_KEY"]
+            st.session_state["gemini_client"] = genai.Client(api_key=api_key)
         except Exception:
-            api_key = ""
-
-    if not api_key:
-        st.session_state["gemini_client"] = None
-        return None
-
-    try:
-        st.session_state["gemini_client"] = genai.Client(api_key=api_key)
-    except Exception:
-        st.session_state["gemini_client"] = None
+            st.session_state["gemini_client"] = None
 
     return st.session_state["gemini_client"]
 
@@ -118,6 +120,9 @@ def obtener_respuesta_ia(user_prompt):
     except Exception as e:
         return f"Ocurrió un error al consultar Gemini: {e}"
 
+
+if gemini_api_key:
+    st.session_state["gemini_api_key"] = gemini_api_key
 
 # --- TABS ---
 tab1, tab2, tab3 = st.tabs(["📊 Cotizador Mayorista", "🤖 Asistente Virtual con IA", "📜 Lista de Precios y Políticas"])
