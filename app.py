@@ -87,12 +87,12 @@ def obtener_cliente_gemini():
             st.session_state["gemini_client"] = None
             return None
 
-     try:
+      try:
          st.session_state["gemini_client"] = genai.Client(api_key=api_key)
      except Exception:
          st.session_state["gemini_client"] = None
 
- return st.session_state["gemini_client"]
+  return st.session_state["gemini_client"]
 
 
 def obtener_respuesta_ia(user_prompt):
