@@ -72,8 +72,7 @@ Consulta del usuario: {user_prompt}
 
 # --- CLIENTE GEMINI CACHADO ---
 def obtener_cliente_gemini():
-    if "gemini_client" not in st.session_state:
-        api_key = st.session_state.get("gemini_api_key", "")
+    
 
         if not api_key:
             api_key = os.environ.get("GOOGLE_API_KEY", "")
