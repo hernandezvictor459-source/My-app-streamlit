@@ -1,9 +1,9 @@
 import os
 import pandas as pd
 import streamlit as st
-from google import genai
+from openai import OpenAI
 
-# --- CONFIGURACIÓN ---
+# --- CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(
     page_title="Asistente Comercial - Masas Delicias del Caribe",
     page_icon="🥟",
@@ -48,10 +48,9 @@ def calcular_cotizacion(cantidad, forma_pago):
     return precio_unitario, subtotal, descuento_monto, total, ahorro_total
 
 
-def crear_prompt(user_prompt):
-    return f"""
-Eres el Asistente Comercial Virtual de la empresa 'Masas Delicias del Caribe, S.R.L.'.
-Respondes en español claro y profesional.
+# --- PROMPT DE SISTEMA COMERCIAL ---
+SYSTEM_PROMPT = """Eres el Asistente Comercial Virtual de la empresa 'Masas Delicias del Caribe, S.R.L.'.
+Respondes en español claro, cordial y profesional.
 
 REGLAS IMPORTANTES:
 1. NO inventes precios. Utiliza estrictamente la siguiente tabla de precios de referencia:
@@ -66,60 +65,91 @@ REGLAS IMPORTANTES:
    - A crédito aprobado: 3% adicional.
 3. Si el usuario te pregunta sobre la aprobación de créditos, aclara amablemente que tú, como IA, no apruebas créditos ni confirmas pagos directos, y que deben comunicarse con el departamento administrativo.
 4. Si te piden redactar un mensaje de cobro o recordatorio de pago atrasado, hazlo de forma sumamente cordial, respetuosa y profesional.
-
-Consulta del usuario: {user_prompt}
 """
 
-# --- CLIENTE GEMINI CACHADO ---
-def obtener_cliente_gemini():
-    if "gemini_client" not in st.session_state:
-        api_key = st.session_state.get("gemini_api_key", "")
-    
 
-        if not api_key:
-            api_key = os.environ.get("GOOGLE_API_KEY", "")
+# --- CLIENTE OPENROUTER (OPENAI COMPATIBLE) ---
+def obtener_configuracion_llm():
+    api_key = ""
+    try:
+        api_key = st.secrets.get("OPENROUTER_API_KEY", "")
+    except Exception:
+        pass
+    if not api_key:
+        api_key = os.environ.get("OPENROUTER_API_KEY", "")
 
-        if not api_key:
-            try:
-                api_key = st.secrets["GEMINI_API_KEY"]
-            except Exception:
-                api_key = ""
+    base_url = "https://openrouter.ai/api/v1"
+    try:
+        base_url = st.secrets.get("OPENROUTER_BASE_URL", base_url)
+    except Exception:
+        pass
+    if os.environ.get("OPENROUTER_BASE_URL"):
+        base_url = os.environ.get("OPENROUTER_BASE_URL")
 
-        if not api_key:
-            st.session_state["gemini_client"] = None
-            return None
+    modelo = "deepseek/deepseek-v4.1-flash-1017"
+    try:
+        modelo = st.secrets.get("OPENROUTER_MODEL", modelo)
+    except Exception:
+        pass
+    if os.environ.get("OPENROUTER_MODEL"):
+        modelo = os.environ.get("OPENROUTER_MODEL")
 
+    return api_key, base_url, modelo
+
+
+def obtener_cliente_openrouter():
+    api_key, base_url, _ = obtener_configuracion_llm()
+    if not api_key or api_key == "pega_aqui_tu_api_key_de_openrouter":
+        return None
+
+    if "openai_client" not in st.session_state or st.session_state.get("_cached_api_key") != api_key:
         try:
-            st.session_state["gemini_client"] = genai.Client(api_key=api_key)
+            st.session_state["openai_client"] = OpenAI(
+                api_key=api_key,
+                base_url=base_url,
+                default_headers={
+                    "HTTP-Referer": "https://masasdelicias.local",
+                    "X-Title": "Masas Delicias del Caribe Asistente",
+                },
+            )
+            st.session_state["_cached_api_key"] = api_key
         except Exception:
-            st.session_state["gemini_client"] = None
+            st.session_state["openai_client"] = None
 
-    return st.session_state["gemini_client"]
+    return st.session_state.get("openai_client")
 
 
 def obtener_respuesta_ia(user_prompt):
-    if genai is None:
-        return "La librería de Gemini no está instalada. Instala 'google-genai' para habilitar esta función."
+    api_key, _, modelo = obtener_configuracion_llm()
+    if not api_key or api_key == "pega_aqui_tu_api_key_de_openrouter":
+        return (
+            "⚠️ **API Key no configurada.**\n\n"
+            "Por favor, abre el archivo `.streamlit/secrets.toml` y reemplaza "
+            "`\"pega_aqui_tu_api_key_de_openrouter\"` por tu clave real de OpenRouter."
+        )
 
-    client = obtener_cliente_gemini()
+    client = obtener_cliente_openrouter()
     if client is None:
-        return "No se encontró una API key de Gemini. Añádela en Streamlit Secrets o en la variable de entorno GOOGLE_API_KEY."
+        return "⚠️ Error al inicializar el cliente de OpenRouter. Revisa tu clave y configuración."
 
     try:
-        with st.spinner("🥟 Consultando al asistente comercial..."):
-            response = client.models.generate_content(
-                model="gemini-3.8-flash",
-                contents=crear_prompt(user_prompt),
+        with st.spinner(f"🥟 Consultando al asistente ({modelo})..."):
+            completion = client.chat.completions.create(
+                model=modelo,
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": user_prompt},
+                ],
+                temperature=0.3,
             )
 
-        texto = getattr(response, "text", None)
-        if texto:
-            return texto.strip()
-        return str(response)
+        respuesta = completion.choices[0].message.content
+        if respuesta:
+            return respuesta.strip()
+        return "No se recibió respuesta del modelo."
 
     except Exception as e:
-        return f"Ocurrió un error al consultar Gemini: {e}"
-
+        return f"Ocurrió un error al consultar OpenRouter ({modelo}): {e}"
 
 
 # --- TABS ---
@@ -204,7 +234,7 @@ with tab3:
 - Los créditos son autorizados única y exclusivamente por el departamento administrativo de la empresa."""
     )
 
-# --- ESTILO VISUAL (se mantiene igual) ---
+# --- ESTILO VISUAL ---
 st.markdown(
     """
     <style>
