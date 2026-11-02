@@ -121,8 +121,6 @@ def obtener_respuesta_ia(user_prompt):
         return f"Ocurrió un error al consultar Gemini: {e}"
 
 
-if gemini_api_key:
-    st.session_state["gemini_api_key"] = gemini_api_key
 
 # --- TABS ---
 tab1, tab2, tab3 = st.tabs(["📊 Cotizador Mayorista", "🤖 Asistente Virtual con IA", "📜 Lista de Precios y Políticas"])
